@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 public class ChatViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    private final MutableLiveData<String> mText;
 
     public ChatViewModel() {
         mText = new MutableLiveData<>();

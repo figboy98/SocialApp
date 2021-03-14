@@ -4,16 +4,21 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class PostsViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    private final List<Post> posts = new ArrayList<>();
 
     public PostsViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public List<Post> getPosts() {
+        return posts;
     }
+
 }

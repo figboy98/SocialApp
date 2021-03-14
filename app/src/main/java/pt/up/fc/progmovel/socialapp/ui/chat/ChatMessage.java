@@ -7,10 +7,11 @@ public class ChatMessage {
     private String mTextMessage, mFrom, mTo;
     private Date mDate;
 
-    public ChatMessage(){
+    public ChatMessage() {
 
     }
-    public ChatMessage(String str, Date date, String from, String to){
+
+    public ChatMessage(String str, Date date, String from, String to) {
         mTextMessage = str;
         mDate = date;
         mFrom = from;

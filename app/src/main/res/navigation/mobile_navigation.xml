@@ -12,13 +12,13 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_posts"
         android:name="pt.up.fc.progmovel.socialapp.ui.posts.PostsFragment"
         android:label="@string/title_posts"
         tools:layout="@layout/fragment_posts" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
+        android:id="@+id/navigation_chat"
         android:name="pt.up.fc.progmovel.socialapp.ui.chat.ChatFragment"
         android:label="@string/title_chat"
         tools:layout="@layout/fragment_chat" />

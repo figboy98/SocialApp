@@ -13,9 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.socialapp.R;
 
-import pt.up.fc.progmovel.socialapp.ui.chat.ChatMessage;
-
-public class ChatMessageFragment  extends Fragment {
+public class ChatMessageFragment extends Fragment {
 
     private ChatMessage mChatMessage;
     private EditText mChatText;
@@ -27,7 +25,7 @@ public class ChatMessageFragment  extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -41,7 +39,7 @@ public class ChatMessageFragment  extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mChatMessage.setTextMessage(s.toString());
-                Toast toast = Toast.makeText(getContext(),"Clicked", Toast.LENGTH_LONG);
+                Toast toast = Toast.makeText(getContext(), "Clicked", Toast.LENGTH_LONG);
                 toast.show();
 
             }
