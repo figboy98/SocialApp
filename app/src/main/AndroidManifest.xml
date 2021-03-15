@@ -20,6 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="pt.up.fc.progmovel.socialapp.ui.chat.ChatActivity"
+            android:exported="true"
+        />
     </application>
 
 </manifest>
