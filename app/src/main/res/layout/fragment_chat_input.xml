@@ -3,25 +3,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relativeLayout"
+    android:id="@+id/fragment_chat_input"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="pt.up.fc.progmovel.socialapp.ui.chat.ChatFragment"><![CDATA[
-    android:orientation="horizontal">
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ]]>
+    tools:context="pt.up.fc.progmovel.socialapp.ui.chat.ChatInputFragment">
 
     <EditText
         android:id="@+id/chat_message_input"
@@ -34,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/send_image_button"
         app:layout_constraintStart_toStartOf="parent"
-        android:inputType="TODO"/>
+        />
 
     <ImageButton
         android:id="@+id/send_image_button"

@@ -17,14 +17,22 @@ public class ChatActivity extends AppCompatActivity {
 
         FragmentManager fm = getSupportFragmentManager();
 
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        Fragment inputChat = new ChatInputFragment();
 
-        if(fragment == null){
-            fragment = new ChatFragment();
+        Fragment messagesList = new ChatMessageListFragment();
+
+
+
+        /*fm.beginTransaction()
+                    .add(R.id.container, inputChat)
+                    .commit();
+        }*/
+
+
             fm.beginTransaction()
-                    .add(R.id.fragment_container,fragment)
+                    .add(R.id.container, messagesList)
                     .commit();
         }
-    }
+   // }
 
 }
