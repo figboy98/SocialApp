@@ -8,29 +8,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/chat_message_input_placeholder"
-        android:layout_width="483dp"
-        android:layout_height="31dp"
-        android:layout_marginBottom="10dp"
-        android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout="@layout/fragment_chat_input"
-        tools:layout_editor_absoluteX="1dp"
-        tools:text="Chat input" />
-
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/chat_messages_list"
+        android:id="@+id/chat_messages_list_placeholder"
         android:layout_width="match_parent"
         android:layout_height="699dp"
         android:padding="20dp"
         app:layout_constraintBottom_toTopOf="@+id/chat_message_input"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout="@layout/fragment_chat_conversation"
-        tools:text="Messages List" /> -->
+        tools:text="Messages List" >
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/chat_message_input_placeholder"
+            android:layout_width="483dp"
+            android:layout_height="31dp"
+            android:layout_marginBottom="16dp"
+            android:padding="20dp"
+            tools:layout="@layout/fragment_chat_input"
+            tools:text="Chat input" />
+    </androidx.fragment.app.FragmentContainerView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,16 +21,12 @@ public class ChatActivity extends AppCompatActivity {
 
         Fragment messagesList = new ChatMessageListFragment();
 
-
-
-        /*fm.beginTransaction()
-                    .add(R.id.container, inputChat)
+        fm.beginTransaction()
+                    .replace(R.id.chat_message_input_placeholder, inputChat)
                     .commit();
-        }*/
 
-
-            fm.beginTransaction()
-                    .add(R.id.container, messagesList)
+        fm.beginTransaction()
+                    .replace(R.id.chat_messages_list_placeholder, messagesList)
                     .commit();
         }
    // }

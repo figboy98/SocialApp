@@ -43,7 +43,6 @@ public class ChatMessageListFragment extends Fragment {
             }
         };
 
-        updateUI(mMessagesViewModel.getMessages().getValue());
         mMessagesViewModel.getMessages().observe(getViewLifecycleOwner(), messagesObserver);
 
         return view;
@@ -76,9 +75,11 @@ public class ChatMessageListFragment extends Fragment {
             mChatMessage = message;
             if(message.getFrom().equals("me")){
                 mMessageSent.setText(message.getTextMessage().toString());
+                mMessageReceived.setVisibility(View.INVISIBLE);
             }
             else{
                 mMessageReceived.setText(message.getTextMessage().toString());
+                mMessageSent.setVisibility(View.INVISIBLE);
             }
         }
     }
