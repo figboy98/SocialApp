@@ -36,6 +36,7 @@ public class ChatMessageListFragment extends Fragment {
 
         mMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+
         final Observer<List<ChatMessage>> messagesObserver = new Observer<List<ChatMessage>>() {
             @Override
             public void onChanged(@Nullable final List<ChatMessage> chatMessageList) {
@@ -57,6 +58,8 @@ public class ChatMessageListFragment extends Fragment {
         else{
             mMessageAdapter.notifyDataSetChanged();
         }
+        mMessagesRecyclerView.scrollToPosition(messagesList.size()-1);
+
     }
 
     private class MessageHolder extends RecyclerView.ViewHolder{

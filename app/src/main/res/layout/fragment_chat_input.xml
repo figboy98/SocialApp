@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_chat_input"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="pt.up.fc.progmovel.socialapp.ui.chat.ChatInputFragment">
+    android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/chat_message_input"
@@ -14,12 +13,15 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@color/design_default_color_on_primary"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:hint="@string/chat_message_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/send_image_button"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        android:autofillHints=""
+        android:inputType="text" />
 
     <ImageButton
         android:id="@+id/send_image_button"
@@ -28,6 +30,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:background="@android:color/white"
+        android:contentDescription="@string/input_send_description"
         android:src="@drawable/outline_send_black_36"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

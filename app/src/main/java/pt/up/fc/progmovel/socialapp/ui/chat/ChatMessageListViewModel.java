@@ -16,11 +16,22 @@ public class ChatMessageListViewModel extends ViewModel {
         mMessageList = new MutableLiveData<List<ChatMessage>>();
         List<ChatMessage> mList = new ArrayList<ChatMessage>();
         Date date = new Date();
-        ChatMessage mSent = new ChatMessage("Hello", date, "me", "you");
-        ChatMessage mReceived = new ChatMessage("Hello you too", date, "you", "me");
-        mList.add(mSent);
-        mList.add(mReceived);
+        for(int i=0; i<1000; i++){
+            String f;
+            String t;
+            if(i%2==0){
+                f = "me";
+                t=  "you";
+            }
+            else{
+                f="you";
+                t="me";
+            }
+            ChatMessage mSent = new ChatMessage("Hello" + i, date, f, t);
+            mList.add(mSent);
+        }
         mMessageList.setValue(mList);
+
     }
 
     public LiveData<List<ChatMessage>> getMessages() {
