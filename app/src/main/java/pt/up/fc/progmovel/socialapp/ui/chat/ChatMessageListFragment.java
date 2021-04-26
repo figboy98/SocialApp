@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,6 +23,8 @@ public class ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
     private ChatMessageListViewModel mMessagesViewModel;
     private MessageAdapter mMessageAdapter;
+    private static final  int TEXT_RECEIVED =0;
+    private static final  int TEXT_SENT =1;
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
@@ -62,50 +66,88 @@ public class ChatMessageListFragment extends Fragment {
 
     }
 
-    private class MessageHolder extends RecyclerView.ViewHolder{
+    private class MessageTextReceived extends RecyclerView.ViewHolder {
         private ChatMessage mChatMessage;
-        private TextView mMessageReceived;
-        private TextView mMessageSent;
+        private TextView mMessage;
 
-        public MessageHolder(LayoutInflater inflater, ViewGroup parent){
-            super(inflater.inflate(R.layout.conversation_message,parent,false));
+        public MessageTextReceived(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.conversation_message_received, parent, false));
 
-            mMessageReceived = itemView.findViewById(R.id.receiver_message_text);
-            mMessageSent = itemView.findViewById(R.id.sender_messsage_text);
+            mMessage = itemView.findViewById(R.id.message_received_holder);
+        }
+
+        public void bind(ChatMessage message) {
+            mChatMessage = message;
+            mMessage.setText(message.getTextMessage().toString());
+
+
+        }
+    }
+
+    private class MessageTextSent extends RecyclerView.ViewHolder{
+        private  ChatMessage mChatMessage;
+        private  TextView mMessage;
+
+        public MessageTextSent(LayoutInflater inflater, ViewGroup parent){
+            super(inflater.inflate(R.layout.conversation_message_sent,parent,false));
+
+            mMessage =  itemView.findViewById(R.id.message_sent_holder);
         }
 
         public void bind(ChatMessage message){
             mChatMessage = message;
-            if(message.getFrom().equals("me")){
-                mMessageSent.setText(message.getTextMessage().toString());
-                mMessageReceived.setVisibility(View.INVISIBLE);
-            }
-            else{
-                mMessageReceived.setText(message.getTextMessage().toString());
-                mMessageSent.setVisibility(View.INVISIBLE);
-            }
+            mMessage.setText(message.getTextMessage().toString());
         }
     }
 
-    private class MessageAdapter extends  RecyclerView.Adapter<MessageHolder>{
+
+    private class MessageAdapter extends  RecyclerView.Adapter{
         private List<ChatMessage> mChatMessageList;
         public MessageAdapter(List<ChatMessage> messages){
             mChatMessageList = messages;
         }
 
-        @NonNull
         @Override
-        public MessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return new MessageHolder(layoutInflater,parent);
+        public int getItemViewType(int position){
+             ChatMessage message = mChatMessageList.get(position);
+            if(message.getFrom().toString().equals("me")){
+                return TEXT_SENT;
+            }
+            else{
+                return  TEXT_RECEIVED;
+            }
 
         }
 
+        @NonNull
         @Override
-        public void onBindViewHolder(@NonNull MessageHolder holder, int position) {
-            ChatMessage message = mChatMessageList.get(position);
-            holder.bind(message);
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
 
+            switch (viewType){
+                case TEXT_RECEIVED:
+                    return new MessageTextReceived(layoutInflater,parent);
+                case TEXT_SENT:
+                    return new MessageTextSent(layoutInflater,parent);
+                default:
+                    return null;
+            }
+        }
+
+
+        @Override
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            ChatMessage message = mChatMessageList.get(position);
+            switch (holder.getItemViewType()) {
+                case TEXT_RECEIVED:
+                    MessageTextReceived messageTextReceived = (MessageTextReceived) holder;
+                    messageTextReceived.bind(message);
+                    break;
+                case TEXT_SENT:
+                    MessageTextSent messageTextSent = (MessageTextSent) holder;
+                    messageTextSent.bind(message);
+                    break;
+            }
         }
 
         @Override

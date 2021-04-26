@@ -27,7 +27,7 @@ public class ChatMessageListViewModel extends ViewModel {
                 f="you";
                 t="me";
             }
-            ChatMessage mSent = new ChatMessage("Hello" + i, date, f, t);
+            ChatMessage mSent = new ChatMessage("Hellodssssssssssssssssfdsfsdfsffwefefdsfsfsdfsdfsfs sdfsdfdsfsdfsd dsfsddsfsdf " + i, date, f, t);
             mList.add(mSent);
         }
         mMessageList.setValue(mList);
