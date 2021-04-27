@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/message_image_sent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="15dp">
+    android:layout_height="match_parent"
+    android:paddingTop="15dp"
+    >
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_sent_message"
+        android:id="@+id/left_guideline_sent_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -16,14 +17,37 @@
 
     </androidx.constraintlayout.widget.Guideline>
 
-    <ImageView
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/image_sent_bottom_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:src="@drawable/default_image" />
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6">
 
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline_sent_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.97">
+
+    </androidx.constraintlayout.widget.Guideline>
+
+    <ImageView
+        android:id="@+id/image_sent_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/chat_image_description"
+        android:scaleType="centerCrop"
+        app:layout_constrainedHeight="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/image_sent_bottom_guideline"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toRightOf="@id/left_guideline_sent_image"
+        app:layout_constraintRight_toRightOf="@id/right_guideline_sent_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/default_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,4 +24,5 @@
     <string name="chat_message_hint">Enter text</string>
     <string name="input_send_description">SendButton</string>
     <string name="images_button">choose_image_button</string>
+    <string name="chat_image_description">Image_sent</string>
 </resources>
