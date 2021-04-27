@@ -16,7 +16,7 @@ public class ChatMessageListViewModel extends ViewModel {
         mMessageList = new MutableLiveData<List<ChatMessage>>();
         List<ChatMessage> mList = new ArrayList<ChatMessage>();
         Date date = new Date();
-        for(int i=0; i<1000; i++){
+        for(int i=0; i<100; i++){
             String f;
             String t;
             if(i%2==0){
@@ -27,6 +27,7 @@ public class ChatMessageListViewModel extends ViewModel {
                 f="you";
                 t="me";
             }
+
             ChatMessage mSent = new ChatMessage("Hellodssssssssssssssssfdsfsdfsffwefefdsfsfsdfsdfsfs sdfsdfdsfsdfsd dsfsddsfsdf " + i, date, f, t);
             mList.add(mSent);
         }

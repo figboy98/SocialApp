@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -71,7 +69,7 @@ public class ChatMessageListFragment extends Fragment {
         private TextView mMessage;
 
         public MessageTextReceived(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.conversation_message_received, parent, false));
+            super(inflater.inflate(R.layout.chat_text_received, parent, false));
 
             mMessage = itemView.findViewById(R.id.message_received_holder);
         }
@@ -89,7 +87,7 @@ public class ChatMessageListFragment extends Fragment {
         private  TextView mMessage;
 
         public MessageTextSent(LayoutInflater inflater, ViewGroup parent){
-            super(inflater.inflate(R.layout.conversation_message_sent,parent,false));
+            super(inflater.inflate(R.layout.chat_text_sent,parent,false));
 
             mMessage =  itemView.findViewById(R.id.message_sent_holder);
         }

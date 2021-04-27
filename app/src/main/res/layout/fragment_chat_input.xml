@@ -9,31 +9,43 @@
 
     <EditText
         android:id="@+id/chat_message_input"
-        android:layout_width="354dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:autofillHints=""
         android:background="@color/design_default_color_on_primary"
+        android:hint="@string/chat_message_hint"
+        android:inputType="text"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:hint="@string/chat_message_hint"
+        android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/send_image_button"
-        app:layout_constraintStart_toStartOf="parent"
-        android:autofillHints=""
-        android:inputType="text" />
+        app:layout_constraintStart_toEndOf="@+id/imageButton"
+        app:layout_constraintTop_toTopOf="@+id/imageButton" />
 
     <ImageButton
         android:id="@+id/send_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
         android:background="@android:color/white"
         android:contentDescription="@string/input_send_description"
-        android:src="@drawable/outline_send_black_36"
+        android:src="@drawable/ic_chat_send_40"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_message_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/chat_message_input"
+        app:layout_constraintTop_toTopOf="@+id/chat_message_input" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:contentDescription="@string/images_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:src="@drawable/ic_chat_add_photo_40"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
