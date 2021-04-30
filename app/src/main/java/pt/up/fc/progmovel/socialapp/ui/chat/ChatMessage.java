@@ -1,21 +1,24 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.media.Image;
+
 import java.util.Date;
 
 public class ChatMessage {
 
-    private String mTextMessage, mFrom, mTo;
+    private String mTextMessage, mFrom, mTo, mType;
     private Date mDate;
 
     public ChatMessage() {
 
     }
 
-    public ChatMessage(String str, Date date, String from, String to) {
-        mTextMessage = str;
+    public ChatMessage(String message, Date date, String from, String to, String type) {
+        mTextMessage = message;
         mDate = date;
         mFrom = from;
         mTo = to;
+        mType= type;
     }
 
     public String getTextMessage() {
@@ -32,6 +35,10 @@ public class ChatMessage {
 
     public String getTo() {
         return mTo;
+    }
+
+    public String getType(){
+        return mType;
     }
 
     public void setTextMessage(String textMessage) {

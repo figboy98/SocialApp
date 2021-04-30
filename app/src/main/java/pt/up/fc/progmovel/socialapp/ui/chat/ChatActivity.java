@@ -29,9 +29,6 @@ public class ChatActivity extends FragmentActivity {
                     .replace(R.id.chat_messages_list_placeholder, messagesList)
                     .commit();
 
-        /*fm.beginTransaction()
-                    .replace(R.id.chat_messages_list_placeholder, messagesList)
-                    .commit();*/
         }
 
 }

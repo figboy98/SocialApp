@@ -27,7 +27,7 @@
     </androidx.constraintlayout.widget.Guideline>
 
     <ImageView
-        android:id="@+id/image_sent_holder"
+        android:id="@+id/video_sent_holder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/chat_image_description"
@@ -38,6 +38,16 @@
         app:layout_constraintRight_toRightOf="@id/right_guideline_sent_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/default_image" />
+
+    <ImageButton
+        android:id="@+id/video_play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_baseline_play_arrow_24"
+        app:layout_constraintBottom_toBottomOf="@+id/video_sent_holder"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline_sent_image"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline_sent_image"
+        app:layout_constraintTop_toTopOf="@+id/video_sent_holder" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

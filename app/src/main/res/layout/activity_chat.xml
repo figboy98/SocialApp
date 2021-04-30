@@ -9,6 +9,15 @@
     android:layout_height="match_parent"
     android:padding="10dp">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top_chat_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7">
+
+    </androidx.constraintlayout.widget.Guideline>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/chat_messages_list_placeholder"
         android:layout_width="0dp"
@@ -24,11 +33,14 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/chat_message_input_placeholder"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline_top_chat_input"
+        app:layout_constraintVertical_bias="1.0"
         tools:text="Chat input" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
