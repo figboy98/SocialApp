@@ -4,29 +4,51 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
+
+import java.util.Stack;
+
+import pt.up.fc.progmovel.socialapp.ui.posts.impl.PostViewAdapter;
 
 
 public class PostsFragment extends Fragment {
 
-    private PostsViewModel dashboardViewModel;
+    private PostsViewModel postsViewModel;
+    private RecyclerView postsRecyclerView;
+    private PostViewAdapter postViewAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(PostsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_posts, container, false);
+        postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
+        View view = inflater.inflate(R.layout.fragment_posts, container, false);
+        postsRecyclerView = view.findViewById(R.id.posts_list);
+        postsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        Observer<Stack<Post>> postsObserver = this::updateUI;
+        postsViewModel.getPost().observe(getViewLifecycleOwner(), postsObserver);
 
 
-        return root;
+
+        return view;
+    }
+
+    private void updateUI(Stack<Post> posts){
+        if(postViewAdapter == null){
+            postViewAdapter = new PostViewAdapter(posts, getActivity());
+            postsRecyclerView.setAdapter(postViewAdapter);
+        }else{
+            postViewAdapter.notifyDataSetChanged();
+        }
+
+        postsRecyclerView.scrollToPosition(0);
     }
 
 }
