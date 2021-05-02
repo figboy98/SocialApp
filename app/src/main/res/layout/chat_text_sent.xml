@@ -19,7 +19,7 @@
 
 
     <TextView
-        android:id="@+id/message_sent_holder"
+        android:id="@+id/text_sent_holder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/design_default_color_primary"
@@ -28,7 +28,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.97"
-        app:layout_constraintStart_toStartOf="@+id/guideline_sent_message"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline_sent_text"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Received Message" />
 
