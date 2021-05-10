@@ -2,11 +2,21 @@ package pt.up.fc.progmovel.socialapp.ui.chat;
 
 import android.media.Image;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Date;
+import java.util.UUID;
 
-public class ChatMessage {
-
-    private String mTextMessage, mFrom, mTo, mType;
+@Entity
+public class  ChatMessage {
+    @PrimaryKey (autoGenerate = false)
+    private UUID chatMessageID;
+    private String mTextMessage;
+    private String mFrom;
+    private String mTo;
+    private String mType;
     private Date mDate;
 
     public ChatMessage() {
@@ -14,12 +24,14 @@ public class ChatMessage {
     }
 
     public ChatMessage(String message, Date date, String from, String to, String type) {
+        chatMessageID = UUID.randomUUID();
         mTextMessage = message;
         mDate = date;
         mFrom = from;
         mTo = to;
         mType= type;
     }
+    public  UUID getChatMessageID(){ return  chatMessageID; }
 
     public String getTextMessage() {
         return mTextMessage;
