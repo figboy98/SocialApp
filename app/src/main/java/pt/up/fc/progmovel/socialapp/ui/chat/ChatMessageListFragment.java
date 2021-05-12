@@ -18,24 +18,35 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class ChatMessageListFragment extends Fragment {
+public class  ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
     private ChatMessageListViewModel mMessagesViewModel;
+    private ChatMessageListViewModelFactory mChatMessageListViewModelFactory;
     private MessageAdapter mMessageAdapter;
+    private String mChatID;
     private static final  int TEXT_RECEIVED =0;
     private static final  int TEXT_SENT =1;
     private static final int IMAGE_RECEIVED =2;
     private static final int IMAGE_SENT =3;
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
+    private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);
-        mMessagesViewModel = new ViewModelProvider(getActivity()).get(ChatMessageListViewModel.class);
+
+        mChatID  = getArguments().getString(EXTRA_CHATID);
+        mChatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), mChatID);
+        mMessagesViewModel = new ViewModelProvider(getActivity(), mChatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
+
+
     }
 
     @Override
@@ -46,15 +57,15 @@ public class ChatMessageListFragment extends Fragment {
 
         mMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-
-        final Observer<List<ChatMessage>> messagesObserver = new Observer<List<ChatMessage>>() {
+        final Observer<GroupChatWithMessages> messagesObserver = new Observer<GroupChatWithMessages>() {
             @Override
-            public void onChanged(@Nullable final List<ChatMessage> chatMessageList) {
-                updateUI(chatMessageList);
+            public void onChanged(GroupChatWithMessages groupChatWithMessages) {
+                List<ChatMessage> messages = groupChatWithMessages.chatMessages;
+                updateUI(messages);
             }
         };
 
-        mMessagesViewModel.getMessages().observe(getViewLifecycleOwner(), messagesObserver);
+       mMessagesViewModel.getMessages().observe(getViewLifecycleOwner(), messagesObserver);
 
         return view;
     }
@@ -66,7 +77,7 @@ public class ChatMessageListFragment extends Fragment {
             mMessagesRecyclerView.setAdapter(mMessageAdapter);
         }
         else{
-            mMessageAdapter.notifyDataSetChanged();
+            mMessageAdapter.setChatMessageList(messagesList);
         }
         mMessagesRecyclerView.scrollToPosition(messagesList.size()-1);
 
@@ -173,9 +184,14 @@ public class ChatMessageListFragment extends Fragment {
 
 
     private class MessageAdapter extends  RecyclerView.Adapter{
-        private List<ChatMessage> mChatMessageList;
-        public MessageAdapter(List<ChatMessage> messages){
+        private List<ChatMessage> mChatMessageList = new ArrayList<>();
+        public MessageAdapter(List<ChatMessage> messages) {
             mChatMessageList = messages;
+        }
+
+        public void setChatMessageList(List<ChatMessage> messages){
+            mChatMessageList = messages;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -215,7 +231,7 @@ public class ChatMessageListFragment extends Fragment {
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
 
             switch (viewType){
                 case TEXT_RECEIVED:
