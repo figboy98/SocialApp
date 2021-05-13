@@ -42,11 +42,13 @@ public class ChatRepository {
     }
 
     public LiveData<GroupChatWithMessages> getMessagesOfGroupChat(String ID) {
-        chatMessages = chatDao.getGroupChatWithMessages();
+        chatMessages = chatDao.getGroupChatWithMessages(ID);
+
         return chatMessages;
     }
 
     public LiveData<List<ChatMessage>> getChatMessages(){
+
         return  chatDao.getChatMessages();
     }
 

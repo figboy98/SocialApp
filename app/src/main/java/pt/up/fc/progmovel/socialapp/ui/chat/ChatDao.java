@@ -9,26 +9,26 @@ import androidx.room.Transaction;
 import java.util.List;
 
 @Dao
-public interface ChatDao {
+public interface  ChatDao {
 
     @Insert
-    void insertChatMessage(ChatMessage message);
+     void insertChatMessage(ChatMessage message);
 
     @Insert
-    void insertGroupChat(GroupChat groupChat);
+     void insertGroupChat(GroupChat groupChat);
 
     @Insert
-    void insertGroupChatMessagesCrossRef(GroupChatMessagesCrossRef groupChatMessagesCrossRef);
+     void insertGroupChatMessagesCrossRef(GroupChatMessagesCrossRef groupChatMessagesCrossRef);
 
     @Insert
-    void insertGroupChatUsersCrossRef(GroupChatUsersCrossRef groupChatUsersCrossRef);
+     void insertGroupChatUsersCrossRef(GroupChatUsersCrossRef groupChatUsersCrossRef);
 
     @Transaction
-    @Query("SELECT * FROM GroupChat")
-    LiveData<GroupChatWithMessages> getGroupChatWithMessages();
+    @Query("SELECT * FROM GroupChat WHERE groupChatID = :groupChatID")
+     LiveData<GroupChatWithMessages> getGroupChatWithMessages(String groupChatID);
 
-    @Query("SELECT * FROM CHATMESSAGE")
-    LiveData<List<ChatMessage>> getChatMessages();
+    @Query("SELECT * FROM CHATMESSAGE ")
+     LiveData<List<ChatMessage>> getChatMessages();
 
 
 

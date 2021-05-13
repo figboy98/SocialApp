@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-public class  ChatMessage {
+public class  ChatMessage implements Comparable<ChatMessage>{
 
     @PrimaryKey (autoGenerate = false)
     @NonNull
@@ -20,7 +20,7 @@ public class  ChatMessage {
     private String mFrom;
     private String mTo;
     private String mType;
-    private String mDate;
+    private Long mDate;
 
     public ChatMessage() {
 
@@ -29,7 +29,7 @@ public class  ChatMessage {
     public ChatMessage(String message, Date date, String from, String to, String type) {
         chatMessageID = UUID.randomUUID().toString();
         mTextMessage = message;
-        mDate = date.toString();
+        mDate = date.getTime();
         mFrom = from;
         mTo = to;
         mType= type;
@@ -41,7 +41,7 @@ public class  ChatMessage {
         return mTextMessage;
     }
 
-    public String getDate() { return mDate; }
+    public Long getDate() { return mDate; }
 
     public String getFrom() {
         return mFrom;
@@ -63,7 +63,7 @@ public class  ChatMessage {
         mTextMessage = textMessage;
     }
 
-    public void setDate(String date) { mDate = date; }
+    public void setDate(Long date) { mDate = date; }
 
     public void setFrom(String from) {
         mFrom = from;
@@ -77,4 +77,15 @@ public class  ChatMessage {
         mTo = to;
     }
 
+    @Override
+    public int compareTo(ChatMessage o) {
+        Long time = this.mDate -o.mDate;
+        if(time <0){
+            return -1;
+        }
+        else if(time >0){
+            return 1;
+        }
+        return 0;
+    }
 }

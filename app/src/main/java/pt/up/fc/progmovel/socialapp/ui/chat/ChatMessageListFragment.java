@@ -60,8 +60,8 @@ public class  ChatMessageListFragment extends Fragment {
         final Observer<GroupChatWithMessages> messagesObserver = new Observer<GroupChatWithMessages>() {
             @Override
             public void onChanged(GroupChatWithMessages groupChatWithMessages) {
-                List<ChatMessage> messages = groupChatWithMessages.chatMessages;
-                updateUI(messages);
+                List<ChatMessage> orderedMessages = groupChatWithMessages.getSortedMessages();
+                updateUI(orderedMessages);
             }
         };
 

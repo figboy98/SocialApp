@@ -33,8 +33,9 @@ public class ChatActivity extends FragmentActivity {
         String chatID = chat.getGroupChatID();
         mChatID = chatID;
 
-        Date date = new Date();
-        for(int i=0; i<10; i++){
+        for(int i=0; i<100; i++){
+            Date date = new Date();
+
             String f;
             String t;
             if(i%2==0){
@@ -50,10 +51,26 @@ public class ChatActivity extends FragmentActivity {
             repository.insertChatMessage(mSent);
             repository.insertGroupChatMessagesCrossRef(new GroupChatMessagesCrossRef(chatID, mSent.getChatMessageID()));
 
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
         }
+        Date date = new Date();
+
         repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "me", "to", "image"));
+        date = new Date();
+
+
         repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "to", "me","image"));
+        date = new Date();
+
         repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "me", "to","video"));
+        date = new Date();
+
         repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "to", "me", "video"));
 
         Bundle bundle = new Bundle();

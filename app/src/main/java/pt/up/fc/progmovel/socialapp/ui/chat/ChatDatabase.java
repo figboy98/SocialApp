@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase;
                 GroupChatUsersCrossRef.class,
                 GroupChatMessagesCrossRef.class,
         },
-        version = 2
+        version = 3
 )
 public  abstract class ChatDatabase extends RoomDatabase {
 
