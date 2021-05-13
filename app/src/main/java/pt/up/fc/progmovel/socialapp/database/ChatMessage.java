@@ -1,9 +1,6 @@
-package pt.up.fc.progmovel.socialapp.ui.chat;
-
-import android.media.Image;
+package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 

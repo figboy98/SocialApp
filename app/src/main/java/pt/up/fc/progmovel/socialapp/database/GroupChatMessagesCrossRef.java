@@ -1,4 +1,4 @@
-package pt.up.fc.progmovel.socialapp.ui.chat;
+package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;

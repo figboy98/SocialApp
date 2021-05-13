@@ -1,16 +1,9 @@
-package pt.up.fc.progmovel.socialapp.ui.chat;
+package pt.up.fc.progmovel.socialapp.database;
 
 import android.app.Application;
-import android.content.Context;
 import android.os.AsyncTask;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.room.Insert;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -24,8 +17,11 @@ public class ChatRepository {
         chatDao = database.chatDao();
     }
 
-    public void insertChatMessage(ChatMessage message) {
+    public void insertChatMessage(ChatMessage message, String chatId) {
         new InsertChatMessageAsyncTask(chatDao).execute(message);
+        GroupChatMessagesCrossRef ref = new GroupChatMessagesCrossRef(chatId,message.getChatMessageID());
+        new InsertGroupChatMessagesCrossRefAsyncTask(chatDao).execute(ref);
+
     }
 
     public void insertGroupChat(GroupChat groupChat) {

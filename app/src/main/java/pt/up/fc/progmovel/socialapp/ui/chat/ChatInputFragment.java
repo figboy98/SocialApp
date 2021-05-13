@@ -1,52 +1,45 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
 
 import com.example.socialapp.R;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import androidx.lifecycle.Observer;
+
+import pt.up.fc.progmovel.socialapp.database.ChatMessage;
+import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 
 import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 
 
 public class ChatInputFragment extends Fragment {
-    private ChatMessage mChatMessage;
+    private ChatRepository mChatRepository;
+    private String mChatID;
     private EditText mInputMessage;
-    private ImageButton mSendButton;
-    private ImageButton mImagesButton;
-    private ImageButton mVideosButton;
-    //private RecyclerView mImagesOrVideosInput;
-    private ArrayList<Uri> mImagesOrVideosList = new ArrayList<Uri>();
-   // private ImagesVideoInputAdapter mAdapter;
+    // private ImagesVideoInputAdapter mAdapter;
     private final int GET_IMAGE_CODE = 1;
+    private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        mChatMessage = new ChatMessage();
+        ChatMessage chatMessage = new ChatMessage();
+        mChatRepository = new ChatRepository(getActivity().getApplication());
+        mChatID = getArguments().getString(EXTRA_CHATID);
+
     }
 
     @Override
@@ -54,12 +47,14 @@ public class ChatInputFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chat_input, container, false);
 
         mInputMessage = view.findViewById(R.id.chat_message_input);
-        mSendButton = view.findViewById(R.id.send_image_button);
-        mImagesButton = view.findViewById(R.id.image_input_button);
-        mVideosButton = view.findViewById(R.id.video_input_button);
+        ImageButton sendButton = view.findViewById(R.id.send_image_button);
+        ImageButton imagesButton = view.findViewById(R.id.image_input_button);
+        ImageButton videosButton = view.findViewById(R.id.video_input_button);
 
-        mImagesButton.setOnClickListener(new ImagesButtonClickListener("image/*"));
-        mVideosButton.setOnClickListener(new ImagesButtonClickListener("video/*"));
+        imagesButton.setOnClickListener(new ImagesButtonClickListener("image/*"));
+        videosButton.setOnClickListener(new ImagesButtonClickListener("video/*"));
+
+        sendButton.setOnClickListener(new SentButtonClickListener());
 
         /*
         mImagesOrVideosInput = view.findViewById(R.id.recycler_view_images_videos_input);
@@ -71,6 +66,20 @@ public class ChatInputFragment extends Fragment {
         return view;
     }
 
+    private class SentButtonClickListener implements  View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            if(mInputMessage.toString().length() > 0){
+                Date date = new Date();
+                ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date,"me","to","text");
+                mChatRepository.insertChatMessage(message,mChatID);
+            }
+            mInputMessage.setText("");
+
+
+        }
+    }
 
     private class ImagesButtonClickListener implements View.OnClickListener{
         private String mType;
@@ -84,7 +93,8 @@ public class ChatInputFragment extends Fragment {
                     public void onActivityResult(List<Uri> result) {
 
                         if(result.size()>0){
-                            mImagesOrVideosList = (ArrayList)result;
+                            //private RecyclerView mImagesOrVideosInput;
+                            ArrayList<Uri> imagesOrVideosList = (ArrayList) result;
                         }
 
                     }

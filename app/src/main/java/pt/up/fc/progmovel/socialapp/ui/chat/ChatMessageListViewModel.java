@@ -5,13 +5,9 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import java.time.chrono.MinguoChronology;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import pt.up.fc.progmovel.socialapp.database.ChatRepository;
+import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 
 public class ChatMessageListViewModel extends AndroidViewModel {
 

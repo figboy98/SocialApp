@@ -1,4 +1,4 @@
-package pt.up.fc.progmovel.socialapp.ui.chat;
+package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.room.Embedded;
 import androidx.room.Junction;
@@ -9,7 +9,8 @@ import java.util.List;
 import pt.up.fc.progmovel.socialapp.shared.User;
 
 public class GroupChatWithUsers {
-    @Embedded GroupChat group;
+    @Embedded
+    GroupChat group;
     @Relation(
             parentColumn = "groupChatID",
             entityColumn = "userID",

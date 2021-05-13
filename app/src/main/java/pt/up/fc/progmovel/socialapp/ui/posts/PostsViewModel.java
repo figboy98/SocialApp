@@ -1,19 +1,11 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.lang.reflect.Array;
-import java.sql.Date;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Stack;
 
 import pt.up.fc.progmovel.socialapp.shared.User;
-import pt.up.fc.progmovel.socialapp.ui.chat.ChatMessage;
 
 public class PostsViewModel extends ViewModel {
 

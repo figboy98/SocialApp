@@ -1,4 +1,4 @@
-package pt.up.fc.progmovel.socialapp.ui.chat;
+package pt.up.fc.progmovel.socialapp.database;
 
 import android.content.Context;
 
@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase;
                 GroupChatUsersCrossRef.class,
                 GroupChatMessagesCrossRef.class,
         },
-        version = 3
+        version =5
 )
 public  abstract class ChatDatabase extends RoomDatabase {
 

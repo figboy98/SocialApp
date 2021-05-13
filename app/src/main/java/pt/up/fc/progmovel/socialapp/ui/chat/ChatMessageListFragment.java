@@ -1,6 +1,5 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -21,6 +19,9 @@ import com.example.socialapp.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import pt.up.fc.progmovel.socialapp.database.ChatMessage;
+import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 
 public class  ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
@@ -47,6 +48,7 @@ public class  ChatMessageListFragment extends Fragment {
         mMessagesViewModel = new ViewModelProvider(getActivity(), mChatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
 
 
+
     }
 
     @Override
@@ -60,8 +62,10 @@ public class  ChatMessageListFragment extends Fragment {
         final Observer<GroupChatWithMessages> messagesObserver = new Observer<GroupChatWithMessages>() {
             @Override
             public void onChanged(GroupChatWithMessages groupChatWithMessages) {
-                List<ChatMessage> orderedMessages = groupChatWithMessages.getSortedMessages();
-                updateUI(orderedMessages);
+                if(groupChatWithMessages !=null){
+                    List<ChatMessage> orderedMessages = groupChatWithMessages.getSortedMessages();
+                    updateUI(orderedMessages);
+                }
             }
         };
 
