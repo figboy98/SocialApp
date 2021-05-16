@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -175,8 +176,11 @@ public class  ChatMessageListFragment extends Fragment {
             mVideo = itemView.findViewById(R.id.video_received_holder);
         }
         public void bind(ChatMessage message){
-            Uri imageUri = Uri.parse(message.getTextMessage());
-            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mVideo);
+            Uri videoUri = Uri.parse(message.getTextMessage());
+            MediaMetadataRetriever m = new MediaMetadataRetriever();
+            m.setDataSource(getContext(),videoUri);
+            Bitmap btm = m.getFrameAtTime();
+            mVideo.setImageBitmap(btm);
         }
     }
 
@@ -188,8 +192,11 @@ public class  ChatMessageListFragment extends Fragment {
             mVideo = itemView.findViewById(R.id.video_sent_holder);
         }
         public void bind(ChatMessage message){
-            Uri imageUri = Uri.parse(message.getTextMessage());
-            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mVideo);
+            Uri videoUri = Uri.parse(message.getTextMessage());
+            MediaMetadataRetriever m = new MediaMetadataRetriever();
+            m.setDataSource(getContext(),videoUri);
+            Bitmap btm = m.getFrameAtTime();
+            mVideo.setImageBitmap(btm);
         }
     }
 

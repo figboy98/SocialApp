@@ -91,13 +91,20 @@ public class ChatInputFragment extends Fragment {
                 new ActivityResultCallback<List<Uri>>() {
                     @Override
                     public void onActivityResult(List<Uri> result) {
+                        String messageType;
+                        if(mType.equals("images/*")){
+                            messageType = "image";
+                        }
+                        else{
+                            messageType = "video";
+                        }
 
 
                         if(result.size()>0){
                             for(int i=0; i<result.size(); i++){
                                 Date date = new Date();
                                 String imagePath = result.get(i).toString();
-                                ChatMessage message = new ChatMessage(imagePath,date,  "me", "to", "image");
+                                ChatMessage message = new ChatMessage(imagePath,date,  "me", "to", messageType);
                                 mChatRepository.insertChatMessage(message,mChatID);
                             }
                         }
