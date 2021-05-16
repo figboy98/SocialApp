@@ -92,7 +92,7 @@ public class ChatInputFragment extends Fragment {
                     @Override
                     public void onActivityResult(List<Uri> result) {
                         String messageType;
-                        if(mType.equals("images/*")){
+                        if(mType.equals("image/*")){
                             messageType = "image";
                         }
                         else{
