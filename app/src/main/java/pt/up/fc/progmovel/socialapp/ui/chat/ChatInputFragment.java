@@ -92,9 +92,14 @@ public class ChatInputFragment extends Fragment {
                     @Override
                     public void onActivityResult(List<Uri> result) {
 
+
                         if(result.size()>0){
-                            //private RecyclerView mImagesOrVideosInput;
-                            ArrayList<Uri> imagesOrVideosList = (ArrayList) result;
+                            for(int i=0; i<result.size(); i++){
+                                Date date = new Date();
+                                String imagePath = result.get(i).toString();
+                                ChatMessage message = new ChatMessage(imagePath,date,  "me", "to", "image");
+                                mChatRepository.insertChatMessage(message,mChatID);
+                            }
                         }
 
                     }

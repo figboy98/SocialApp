@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.20">
+        app:layout_constraintGuide_percent="0.20194647">
 
     </androidx.constraintlayout.widget.Guideline>
 
@@ -31,13 +31,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/chat_image_description"
-        android:scaleType="centerCrop"
         app:layout_constrainedWidth="true"
+        app:layout_constrainedHeight="true"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toRightOf="@id/left_guideline_sent_image"
         app:layout_constraintRight_toRightOf="@id/right_guideline_sent_image"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/default_image" />
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"/>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

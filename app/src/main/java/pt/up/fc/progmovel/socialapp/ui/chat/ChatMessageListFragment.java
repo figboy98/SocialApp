@@ -1,24 +1,41 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.content.ContentResolver;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContentResolverCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.BitmapCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
@@ -26,9 +43,7 @@ import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 public class  ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
     private ChatMessageListViewModel mMessagesViewModel;
-    private ChatMessageListViewModelFactory mChatMessageListViewModelFactory;
     private MessageAdapter mMessageAdapter;
-    private String mChatID;
     private static final  int TEXT_RECEIVED =0;
     private static final  int TEXT_SENT =1;
     private static final int IMAGE_RECEIVED =2;
@@ -43,9 +58,12 @@ public class  ChatMessageListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);
 
-        mChatID  = getArguments().getString(EXTRA_CHATID);
-        mChatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), mChatID);
-        mMessagesViewModel = new ViewModelProvider(getActivity(), mChatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
+        String chatID = null;
+        if (getArguments() != null) {
+            chatID = getArguments().getString(EXTRA_CHATID);
+        }
+        ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), chatID);
+        mMessagesViewModel = new ViewModelProvider(getActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
 
 
 
@@ -59,13 +77,10 @@ public class  ChatMessageListFragment extends Fragment {
 
         mMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final Observer<GroupChatWithMessages> messagesObserver = new Observer<GroupChatWithMessages>() {
-            @Override
-            public void onChanged(GroupChatWithMessages groupChatWithMessages) {
-                if(groupChatWithMessages !=null){
-                    List<ChatMessage> orderedMessages = groupChatWithMessages.getSortedMessages();
-                    updateUI(orderedMessages);
-                }
+        final Observer<GroupChatWithMessages> messagesObserver = groupChatWithMessages -> {
+            if(groupChatWithMessages !=null){
+                List<ChatMessage> orderedMessages = groupChatWithMessages.getSortedMessages();
+                updateUI(orderedMessages);
             }
         };
 
@@ -122,8 +137,7 @@ public class  ChatMessageListFragment extends Fragment {
     }
 
     private class MessageImageSent extends  RecyclerView.ViewHolder{
-        private ChatMessage mChatMessage;
-        private ImageView mImage;
+        private final ImageView mImage;
 
         public MessageImageSent(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.chat_image_sent,parent,false));
@@ -131,17 +145,15 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message){
-            mChatMessage = message;
-            //Uri imagePath = Uri.parse(message.getTextMessage());
-            //mImage.setImageURI(imagePath);
-            mImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.default_image, getContext().getTheme()));
+
+            Uri imageUri = Uri.parse(message.getTextMessage());
+            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
 
         }
     }
 
     private class MessageImageReceived extends  RecyclerView.ViewHolder{
-        private ChatMessage mChatMessage;
-        private ImageView mImage;
+        private final ImageView mImage;
 
         public MessageImageReceived(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.chat_image_received,parent,false));
@@ -149,40 +161,35 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message){
-            mChatMessage = message;
-            //Uri imagePath = Uri.parse(message.getTextMessage());
-            //mImage.setImageURI(imagePath);
-            mImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.default_image, getContext().getTheme()));
-
+            Uri imageUri = Uri.parse(message.getTextMessage());
+            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
 
         }
     }
 
     private class MessageVideoReceived extends RecyclerView.ViewHolder{
-        private ChatMessage mChatMessage;
-        private ImageView mVideo;
+        private final ImageView mVideo;
 
         public MessageVideoReceived(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.chat_video_received,parent,false));
             mVideo = itemView.findViewById(R.id.video_received_holder);
         }
         public void bind(ChatMessage message){
-            mChatMessage = message;
-            mVideo.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.default_image, getContext().getTheme()));
+            Uri imageUri = Uri.parse(message.getTextMessage());
+            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mVideo);
         }
     }
 
     private class MessageVideoSent extends RecyclerView.ViewHolder{
-        private ChatMessage mChatMessage;
-        private ImageView mVideo;
+        private final ImageView mVideo;
 
         public MessageVideoSent(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.chat_video_sent,parent,false));
             mVideo = itemView.findViewById(R.id.video_sent_holder);
         }
         public void bind(ChatMessage message){
-            mChatMessage = message;
-            mVideo.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.default_image, getContext().getTheme()));
+            Uri imageUri = Uri.parse(message.getTextMessage());
+            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mVideo);
         }
     }
 
