@@ -56,13 +56,6 @@ public class ChatInputFragment extends Fragment {
 
         sendButton.setOnClickListener(new SentButtonClickListener());
 
-        /*
-        mImagesOrVideosInput = view.findViewById(R.id.recycler_view_images_videos_input);
-        mImagesOrVideosInput.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        mAdapter = new ImagesVideoInputAdapter(mImagesOrVideosList);
-        mImagesOrVideosInput.setAdapter(mAdapter);*/
-
         return view;
     }
 

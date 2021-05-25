@@ -34,43 +34,6 @@ public class ChatActivity extends FragmentActivity {
         String chatID = chat.getGroupChatID();
         mChatID = chatID;
 
-        /*for(int i=0; i<10; i++){
-            Date date = new Date();
-
-            String f;
-            String t;
-            if(i%2==0){
-                f = "me";
-                t=  "you";
-            }
-            else{
-                f="you";
-                t="me";
-            }
-
-            ChatMessage mSent = new ChatMessage("Hello " + i, date, f, t, "text");
-            repository.insertChatMessage(mSent, chatID);
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }*/
-       /* Date date = new Date();
-
-        repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "me", "to", "image"));
-        date = new Date();
-
-
-        repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "to", "me","image"));
-        date = new Date();
-
-        repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "me", "to","video"));
-        date = new Date();
-
-        repository.insertChatMessage(new ChatMessage("@drawable/default_image",date,  "to", "me", "video"));*/
-
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_CHATID, mChatID);
 

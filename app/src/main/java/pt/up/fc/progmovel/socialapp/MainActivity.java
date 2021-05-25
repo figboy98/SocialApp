@@ -1,8 +1,7 @@
 package pt.up.fc.progmovel.socialapp;
 
-import android.app.Activity;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -15,9 +14,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import pt.up.fc.progmovel.socialapp.util.BluetoothUtil;
+import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
+import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int BLUETOOTH_PERMISSION = 1;
+    private static final int LOCATION_PERMISSION =2;
+
+    BluetoothAdapter bt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +37,13 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        BluetoothUtil.requestBluetoothEnabled(this);
+        Intent bluetooth = new Intent(this, BluetoothActivity.class);
+        startActivity(bluetooth);
+        Intent communication = new Intent(this, BluetoothService.class);
+        this.startService(communication);
+
+
     }
+
 
 }
