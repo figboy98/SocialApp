@@ -4,11 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 @Entity
-public class  ChatMessage implements Comparable<ChatMessage>{
+public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
 
     @PrimaryKey (autoGenerate = false)
     @NonNull
@@ -32,6 +38,7 @@ public class  ChatMessage implements Comparable<ChatMessage>{
         mType= type;
     }
 
+    @NotNull
     public  String getChatMessageID(){ return  chatMessageID; }
 
     public String getTextMessage() {
@@ -74,6 +81,28 @@ public class  ChatMessage implements Comparable<ChatMessage>{
         mTo = to;
     }
 
+    public byte[] getByte(){
+        byte[] bytes = null;
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = null;
+        try{
+            objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+            bytes = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return  bytes;
+    }
     @Override
     public int compareTo(ChatMessage o) {
         Long time = this.mDate -o.mDate;

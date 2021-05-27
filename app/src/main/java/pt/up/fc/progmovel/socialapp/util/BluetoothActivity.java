@@ -3,17 +3,37 @@ package pt.up.fc.progmovel.socialapp.util;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_CONNECT_DEVICE =1;
@@ -22,6 +42,7 @@ public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_DISCOVERY = 4;
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothServive = null;
+    private LocationManager mLocationManager = null;
     private ActivityResultLauncher<String> requestBluetoothPermission;
     private ActivityResultLauncher<String> requestBTDiscovery;
     private ActivityResultLauncher<String> requestCoarseLocation;
@@ -80,6 +101,9 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //Request necessary permissions to be able to use Bluetooth
         checkPermissions();
+
+        mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
         if (!mBluetoothAdapter.isEnabled()) {
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
@@ -87,19 +111,77 @@ public class BluetoothActivity extends AppCompatActivity {
             intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
             startActivity(intentDiscover);
         }
+
         else if (mBluetoothServive == null) {
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if(!mLocationManager.isLocationEnabled()){
+                Intent location = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(location);
+            }
+        }
+
+
         finish();
-
-
     }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+    }
+
+ /*   private void enableLocationSettings() {
+
+        Activity activity = this;
+
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                // All location settings are satisfied. The client can initialize
+                // location requests here.
+                // ...
+            }
+        });
+
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(activity,
+                                101);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
+
+    }*/
+
+
 
     private void checkPermissions(){
 
 
         if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED){
-
 
             bluetoothUsePermission = true;
         }
@@ -109,6 +191,10 @@ public class BluetoothActivity extends AppCompatActivity {
         }
         if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             coarseLocationPermission = true;
+        }
+
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_CHECKIN_PROPERTIES) == PackageManager.PERMISSION_GRANTED){
+            fineLocationPermission = true;
         }
 
         if(!bluetoothUsePermission) {
