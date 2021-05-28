@@ -22,10 +22,16 @@ public interface  ChatDao {
 
     @Insert
      void insertGroupChatUsersCrossRef(GroupChatUsersCrossRef groupChatUsersCrossRef);
+    @Insert
+    void insertUser(User user);
 
     @Transaction
     @Query("SELECT * FROM GroupChat WHERE groupChatID = :groupChatID")
      LiveData<GroupChatWithMessages> getGroupChatWithMessages(String groupChatID);
+
+    @Transaction
+    @Query("SELECT * FROM User WHERE UserId =:userID ")
+    LiveData<UsersWithGroupChats> getUsersWithGroupChats (String userID);
 
     @Query("SELECT * FROM CHATMESSAGE ")
      LiveData<List<ChatMessage>> getChatMessages();

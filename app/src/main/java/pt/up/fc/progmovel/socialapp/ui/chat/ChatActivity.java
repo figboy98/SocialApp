@@ -1,10 +1,18 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.socialapp.R;
 
@@ -14,11 +22,13 @@ import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 import pt.up.fc.progmovel.socialapp.database.GroupChat;
 import pt.up.fc.progmovel.socialapp.database.GroupChatMessagesCrossRef;
+import pt.up.fc.progmovel.socialapp.ui.home.HomeViewModel;
 
 public class ChatActivity extends FragmentActivity {
     private ChatRepository repository;
     private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
     private String mChatID;
+    private HomeViewModel homeViewModel;
 
 
     @Override
@@ -27,12 +37,12 @@ public class ChatActivity extends FragmentActivity {
         setContentView(R.layout.activity_chat);
         repository = new ChatRepository(getApplication());
 
-        GroupChat chat = new GroupChat("test");
+        /*GroupChat chat = new GroupChat("test");
 
         repository.insertGroupChat(chat);
 
         String chatID = chat.getGroupChatID();
-        mChatID = chatID;
+        mChatID = chatID;*/
 
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_CHATID, mChatID);
@@ -51,5 +61,4 @@ public class ChatActivity extends FragmentActivity {
                     .commit();
 
         }
-
 }

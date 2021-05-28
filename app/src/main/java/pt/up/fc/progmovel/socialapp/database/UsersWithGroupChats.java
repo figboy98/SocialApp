@@ -6,8 +6,6 @@ import androidx.room.Relation;
 
 import java.util.List;
 
-import pt.up.fc.progmovel.socialapp.shared.User;
-
 public class UsersWithGroupChats {
     @Embedded User user;
     @Relation(

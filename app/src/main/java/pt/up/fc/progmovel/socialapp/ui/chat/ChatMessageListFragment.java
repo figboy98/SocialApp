@@ -1,42 +1,31 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
+import android.app.Application;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContentResolverCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.BitmapCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+
 import androidx.lifecycle.ViewModelProvider;
-import androidx.loader.content.CursorLoader;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
@@ -52,6 +41,10 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
     private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    //private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+
+
+    Application mApplication = getActivity().getApplication();
 
 
 
@@ -63,8 +56,10 @@ public class  ChatMessageListFragment extends Fragment {
         if (getArguments() != null) {
             chatID = getArguments().getString(EXTRA_CHATID);
         }
-        ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), chatID);
-        mMessagesViewModel = new ViewModelProvider(getActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
+        mMessagesViewModel = new ViewModelProvider((ViewModelStoreOwner) mApplication).get(ChatMessageListViewModel.class);
+
+        //ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), chatID);
+        //mMessagesViewModel = new ViewModelProvider(getActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
 
 
 

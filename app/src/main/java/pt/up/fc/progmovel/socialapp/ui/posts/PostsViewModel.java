@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.Stack;
 
-import pt.up.fc.progmovel.socialapp.shared.User;
+import pt.up.fc.progmovel.socialapp.database.User;
 
 public class PostsViewModel extends ViewModel {
 

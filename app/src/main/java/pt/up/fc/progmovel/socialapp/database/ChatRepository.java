@@ -10,7 +10,7 @@ import java.util.List;
 public class ChatRepository {
     private ChatDao chatDao;
 
-    private LiveData<GroupChatWithMessages> chatMessages;
+    //private LiveData<GroupChatWithMessages> chatMessages;
 
     public ChatRepository(Application application) {
         ChatDatabase database = ChatDatabase.getDatabase(application);
@@ -24,9 +24,13 @@ public class ChatRepository {
 
     }
 
-    public void insertGroupChat(GroupChat groupChat) {
+    public void insertGroupChat(GroupChat groupChat, List<User> users) {
         new InsertGroupChatAsyncTask(chatDao).execute(groupChat);
 
+        for(User user: users){
+            GroupChatUsersCrossRef ref = new GroupChatUsersCrossRef(user.getUserID(), groupChat.getGroupChatID());
+            new InsertGroupChatUsersCrossRefAsyncTask(chatDao).execute(ref);
+        }
     }
 
     public void insertGroupChatMessagesCrossRef(GroupChatMessagesCrossRef groupChatMessagesCrossRef) {
@@ -38,7 +42,7 @@ public class ChatRepository {
     }
 
     public LiveData<GroupChatWithMessages> getMessagesOfGroupChat(String ID) {
-        chatMessages = chatDao.getGroupChatWithMessages(ID);
+        LiveData<GroupChatWithMessages> chatMessages = chatDao.getGroupChatWithMessages(ID);
 
         return chatMessages;
     }
@@ -46,6 +50,11 @@ public class ChatRepository {
     public LiveData<List<ChatMessage>> getChatMessages(){
 
         return  chatDao.getChatMessages();
+    }
+
+    public LiveData<UsersWithGroupChats> getGroupsFromUser(String ID){
+        LiveData<UsersWithGroupChats> groups;
+        return chatDao.getUsersWithGroupChats(ID);
     }
 
     private static class InsertChatMessageAsyncTask extends AsyncTask<ChatMessage, Void, Void> {

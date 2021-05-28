@@ -38,7 +38,7 @@ public class ChatInputFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
         mChatRepository = new ChatRepository(getActivity().getApplication());
-        mChatID = getArguments().getString(EXTRA_CHATID);
+//        mChatID = getArguments().getString(EXTRA_CHATID);
 
     }
 

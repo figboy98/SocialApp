@@ -1,10 +1,8 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.UUID;
 
-import pt.up.fc.progmovel.socialapp.shared.User;
+import pt.up.fc.progmovel.socialapp.database.User;
 
 public class Post {
 
