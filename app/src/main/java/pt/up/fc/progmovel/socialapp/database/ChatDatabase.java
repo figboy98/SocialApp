@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
                 GroupChatUsersCrossRef.class,
                 GroupChatMessagesCrossRef.class,
         },
-        version =1
+        version =2
 )
 public  abstract class ChatDatabase extends RoomDatabase {
 
@@ -63,13 +63,19 @@ public  abstract class ChatDatabase extends RoomDatabase {
             mChatDao.insertUser(user1);
             mChatDao.insertUser(user2);
 
-            GroupChat chat = new GroupChat("Grupo 1");
+           GroupChat chat = new GroupChat("Grupo 1");
+           GroupChat chat2 = new GroupChat("Grupo 2");
             mChatDao.insertGroupChat(chat);
+            mChatDao.insertGroupChat(chat2);
 
             GroupChatUsersCrossRef  g1 = new GroupChatUsersCrossRef(user1.getUserID(), chat.getGroupChatID());
             GroupChatUsersCrossRef  g2 = new GroupChatUsersCrossRef(user2.getUserID(), chat.getGroupChatID());
+            GroupChatUsersCrossRef  g3 = new GroupChatUsersCrossRef(user1.getUserID(), chat2.getGroupChatID());
+            GroupChatUsersCrossRef  g4 = new GroupChatUsersCrossRef(user2.getUserID(), chat2.getGroupChatID());
             mChatDao.insertGroupChatUsersCrossRef(g1);
             mChatDao.insertGroupChatUsersCrossRef(g2);
+            mChatDao.insertGroupChatUsersCrossRef(g3);
+            mChatDao.insertGroupChatUsersCrossRef(g4);
             return null;
         }
     }

@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
@@ -40,11 +41,10 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int IMAGE_SENT =3;
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
-    private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
-    //private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
 
 
-    Application mApplication = getActivity().getApplication();
+    Application mApplication = requireActivity().getApplication();
 
 
 
@@ -54,12 +54,11 @@ public class  ChatMessageListFragment extends Fragment {
 
         String chatID = null;
         if (getArguments() != null) {
-            chatID = getArguments().getString(EXTRA_CHATID);
+            chatID = getArguments().getString(EXTRA_CHAT_ID);
         }
-        mMessagesViewModel = new ViewModelProvider((ViewModelStoreOwner) mApplication).get(ChatMessageListViewModel.class);
 
-        //ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(getActivity().getApplication(), chatID);
-        //mMessagesViewModel = new ViewModelProvider(getActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
+        ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(requireActivity().getApplication(), chatID);
+        mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
 
 
 

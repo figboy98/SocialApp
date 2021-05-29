@@ -19,7 +19,7 @@ public class ChatMessageListViewModelFactory implements ViewModelProvider.Factor
     }
 
 
-    @SuppressWarnings("unchecked")
+    // @SuppressWarnings("unchecked")
     @NonNull
     @NotNull
     @Override

@@ -2,6 +2,8 @@ package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.OnConflictStrategy;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;

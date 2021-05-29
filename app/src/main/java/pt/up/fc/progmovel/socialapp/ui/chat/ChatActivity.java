@@ -25,8 +25,7 @@ import pt.up.fc.progmovel.socialapp.database.GroupChatMessagesCrossRef;
 import pt.up.fc.progmovel.socialapp.ui.home.HomeViewModel;
 
 public class ChatActivity extends FragmentActivity {
-    private ChatRepository repository;
-    private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
     private String mChatID;
     private HomeViewModel homeViewModel;
 
@@ -35,22 +34,16 @@ public class ChatActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        repository = new ChatRepository(getApplication());
+        mChatID = savedInstanceState.getString(EXTRA_CHAT_ID);
 
-        /*GroupChat chat = new GroupChat("test");
-
-        repository.insertGroupChat(chat);
-
-        String chatID = chat.getGroupChatID();
-        mChatID = chatID;*/
+        ChatRepository repository = new ChatRepository(getApplication());
 
         Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_CHATID, mChatID);
+        bundle.putString(EXTRA_CHAT_ID, mChatID);
 
         FragmentManager fm = getSupportFragmentManager();
 
         Fragment inputChat = new ChatInputFragment();
-        inputChat.setArguments(bundle);
 
         Fragment messagesList = new ChatMessageListFragment();
         messagesList.setArguments(bundle);

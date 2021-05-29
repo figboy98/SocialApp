@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel;
 import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 
-public class ChatMessageListViewModel extends ViewModel {
+public class ChatMessageListViewModel extends AndroidViewModel {
 
     private final LiveData<GroupChatWithMessages> mGroupChatWithMessages;
 
@@ -20,7 +20,7 @@ public class ChatMessageListViewModel extends ViewModel {
 
 
     public ChatMessageListViewModel(@NonNull Application application, String chatID) {
-        super();
+        super(application);
         mChatID = chatID;
         mChatRepository = new ChatRepository(application);
         mGroupChatWithMessages = mChatRepository.getMessagesOfGroupChat(mChatID);

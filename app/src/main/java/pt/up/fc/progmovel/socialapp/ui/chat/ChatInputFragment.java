@@ -29,17 +29,14 @@ public class ChatInputFragment extends Fragment {
     private ChatRepository mChatRepository;
     private String mChatID;
     private EditText mInputMessage;
-    // private ImagesVideoInputAdapter mAdapter;
     private final int GET_IMAGE_CODE = 1;
-    private static final String EXTRA_CHATID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHATID";
 
 
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
-        mChatRepository = new ChatRepository(getActivity().getApplication());
-//        mChatID = getArguments().getString(EXTRA_CHATID);
-
+        mChatRepository = new ChatRepository(requireActivity().getApplication());
     }
 
     @Override
@@ -59,14 +56,14 @@ public class ChatInputFragment extends Fragment {
         return view;
     }
 
-    private class SentButtonClickListener implements  View.OnClickListener{
+    private class SentButtonClickListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
-            if(mInputMessage.toString().length() > 0){
+            if (mInputMessage.toString().length() > 0) {
                 Date date = new Date();
-                ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date,"me","to","text");
-                mChatRepository.insertChatMessage(message,mChatID);
+                ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, "me", "to", "text");
+                mChatRepository.insertChatMessage(message, mChatID);
             }
             mInputMessage.setText("");
 
@@ -74,9 +71,10 @@ public class ChatInputFragment extends Fragment {
         }
     }
 
-    private class ImagesButtonClickListener implements View.OnClickListener{
+    private class ImagesButtonClickListener implements View.OnClickListener {
         private String mType;
-        public ImagesButtonClickListener(String type){
+
+        public ImagesButtonClickListener(String type) {
             mType = type;
         }
 
@@ -85,20 +83,19 @@ public class ChatInputFragment extends Fragment {
                     @Override
                     public void onActivityResult(List<Uri> result) {
                         String messageType;
-                        if(mType.equals("image/*")){
+                        if (mType.equals("image/*")) {
                             messageType = "image";
-                        }
-                        else{
+                        } else {
                             messageType = "video";
                         }
 
 
-                        if(result.size()>0){
-                            for(int i=0; i<result.size(); i++){
+                        if (result.size() > 0) {
+                            for (int i = 0; i < result.size(); i++) {
                                 Date date = new Date();
                                 String imagePath = result.get(i).toString();
-                                ChatMessage message = new ChatMessage(imagePath,date,  "me", "to", messageType);
-                                mChatRepository.insertChatMessage(message,mChatID);
+                                ChatMessage message = new ChatMessage(imagePath, date, "me", "to", messageType);
+                                mChatRepository.insertChatMessage(message, mChatID);
                             }
                         }
 
@@ -110,51 +107,4 @@ public class ChatInputFragment extends Fragment {
             mGetContent.launch(mType);
         }
     }
-
-   /* private class ImagesVideosInput extends RecyclerView.ViewHolder{
-
-        private ImageView mImageVideo;
-
-        public ImagesVideosInput(LayoutInflater inflater, ViewGroup parent){
-            super(inflater.inflate(R.layout.fragment_chat_input,parent,false));
-            mImageVideo = itemView.findViewById(R.id.input_image_video);
-        }
-
-        public void bind(Uri uri){
-
-            mImageVideo.setImageURI(uri);
-        }
-
-    }
-
-    private class ImagesVideoInputAdapter extends RecyclerView.Adapter<ImagesVideosInput>{
-        private ArrayList<Uri> imagesList;
-
-        public ImagesVideoInputAdapter(ArrayList<Uri> list){
-
-            imagesList = list;
-        }
-
-        @NonNull
-        @Override
-        public ImagesVideosInput onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            return  new ImagesVideosInput(layoutInflater,parent);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ImagesVideosInput holder, int position) {
-            Uri uri = imagesList.get(position);
-            holder.bind(uri);
-
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return imagesList.size();
-        }
-    }*/
-
-
 }
