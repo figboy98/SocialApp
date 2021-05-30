@@ -41,10 +41,10 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int IMAGE_SENT =3;
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
 
 
-    Application mApplication = requireActivity().getApplication();
+   // Application mApplication = requireActivity().getApplication();
 
 
 

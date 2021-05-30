@@ -18,8 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.socialapp.R;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,14 +32,18 @@ import java.util.Objects;
 import pt.up.fc.progmovel.socialapp.database.GroupChat;
 import pt.up.fc.progmovel.socialapp.database.UsersWithGroupChats;
 
+interface OnChatGroupListener{
+    void onChatGroupClick(int position);
+}
 
-public class ChatGroupsFragment extends Fragment {
+public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener  {
     private String user2 = "a93de7b0-f672-4da2-8e4e-8aab0cb5bc16";
     private String user1 = "e51832df-435c-45ce-9f02-89273a837c17";
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private OnChatGroupListener mChatGroupListener;
 
 
 
@@ -47,6 +53,7 @@ public class ChatGroupsFragment extends Fragment {
 
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), user1);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
+        mChatGroupListener = (OnChatGroupListener) this;
     }
 
     @Override
@@ -69,25 +76,37 @@ public class ChatGroupsFragment extends Fragment {
 
     private void updateUI(List<GroupChat> groupChatList){
         if(mAdapter == null){
-            mAdapter = new GroupChatAdapter(groupChatList);
+            mAdapter = new GroupChatAdapter(groupChatList,mChatGroupListener);
             mGroupsRecyclerView.setAdapter(mAdapter);
         }
-
         mAdapter.setGroupChatList(groupChatList);
-
     }
 
+    @Override
+    public void onChatGroupClick(int position) {
+        Intent chatActivity = new Intent(getContext(), ChatActivity.class);
+        Bundle bundle = new Bundle();
+        String chatID = Objects.requireNonNull(mGroups.getChatGroups().getValue()).groupChats.get(position).getGroupChatID();
+        bundle.putString(EXTRA_CHAT_ID, chatID);
+        chatActivity.putExtra(EXTRA_CHAT_ID, chatID);
+        //Toast.makeText(getContext(), "Chat Group clicked " + chatID, Toast.LENGTH_LONG).show();
+        startActivity(chatActivity);
+
+    }
 
     private class GroupChatHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private GroupChat mGroupChat;
         private TextView mChatName;
         private ImageView mChatImage;
+        private OnChatGroupListener mChatGroupListener;
 
 
-        public GroupChatHolder(LayoutInflater inflater, ViewGroup parent) {
+        public GroupChatHolder(LayoutInflater inflater, ViewGroup parent, OnChatGroupListener onChatGroupListener) {
             super(inflater.inflate(R.layout.chat_group, parent, false));
             mChatName = itemView.findViewById(R.id.chat_group_name);
             mChatImage = itemView.findViewById(R.id.chat_group_image);
+            itemView.setOnClickListener(this);
+            mChatGroupListener = onChatGroupListener;
         }
 
         public void bind(GroupChat groupChat){
@@ -99,17 +118,17 @@ public class ChatGroupsFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(getActivity(),ChatActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString(EXTRA_CHAT_ID, mGroupChat.getGroupChatID());
-            startActivity(intent);
+            mChatGroupListener.onChatGroupClick(getAdapterPosition());
         }
     }
+
     private class GroupChatAdapter extends RecyclerView.Adapter<GroupChatHolder>{
         private List<GroupChat> mGroupChatList = new ArrayList<>();
+        private OnChatGroupListener mChatGroupListener;
 
-        public GroupChatAdapter(List<GroupChat> groupChatList){
+        public GroupChatAdapter(List<GroupChat> groupChatList, OnChatGroupListener onChatGroupListener){
             mGroupChatList = groupChatList;
+            mChatGroupListener = onChatGroupListener;
         }
 
         @NonNull
@@ -117,7 +136,7 @@ public class ChatGroupsFragment extends Fragment {
         @Override
         public GroupChatHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-            return new GroupChatHolder(layoutInflater,parent);
+            return new GroupChatHolder(layoutInflater,parent, mChatGroupListener);
         }
 
         @Override

@@ -1,5 +1,6 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,7 @@ import pt.up.fc.progmovel.socialapp.database.GroupChatMessagesCrossRef;
 import pt.up.fc.progmovel.socialapp.ui.home.HomeViewModel;
 
 public class ChatActivity extends FragmentActivity {
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
     private String mChatID;
     private HomeViewModel homeViewModel;
 
@@ -34,7 +35,9 @@ public class ChatActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        mChatID = savedInstanceState.getString(EXTRA_CHAT_ID);
+        Intent intent = getIntent();
+        mChatID = intent.getStringExtra(EXTRA_CHAT_ID);
+
 
         ChatRepository repository = new ChatRepository(getApplication());
 
