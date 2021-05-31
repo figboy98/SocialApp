@@ -38,6 +38,4 @@
         android:scaleType="fitXY"
         android:adjustViewBounds="true"/>
 
-<!--        tools:src="@drawable/default_image" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,6 +47,7 @@ public class ChatActivity extends FragmentActivity {
         FragmentManager fm = getSupportFragmentManager();
 
         Fragment inputChat = new ChatInputFragment();
+        inputChat.setArguments(bundle);
 
         Fragment messagesList = new ChatMessageListFragment();
         messagesList.setArguments(bundle);

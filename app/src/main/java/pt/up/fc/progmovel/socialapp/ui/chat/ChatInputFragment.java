@@ -30,13 +30,16 @@ public class ChatInputFragment extends Fragment {
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
-    private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHATID";
+    private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
         mChatRepository = new ChatRepository(requireActivity().getApplication());
+        if(getArguments()!=null){
+            mChatID = getArguments().getString(EXTRA_CHAT_ID);
+        }
     }
 
     @Override
