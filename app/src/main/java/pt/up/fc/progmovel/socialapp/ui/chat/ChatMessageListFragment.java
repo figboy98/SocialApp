@@ -1,17 +1,25 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
 import android.app.Application;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContentResolverCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
@@ -21,10 +29,15 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.socialapp.R;
 import com.squareup.picasso.Picasso;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,6 +55,7 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
     private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private View view;
 
 
    // Application mApplication = requireActivity().getApplication();
@@ -80,7 +94,7 @@ public class  ChatMessageListFragment extends Fragment {
         };
 
        mMessagesViewModel.getMessages().observe(getViewLifecycleOwner(), messagesObserver);
-
+        this.view = view;
         return view;
     }
 
@@ -171,10 +185,11 @@ public class  ChatMessageListFragment extends Fragment {
         }
         public void bind(ChatMessage message){
             Uri videoUri = Uri.parse(message.getTextMessage());
-            MediaMetadataRetriever m = new MediaMetadataRetriever();
-            m.setDataSource(getContext(),videoUri);
-            Bitmap btm = m.getFrameAtTime();
-            mVideo.setImageBitmap(btm);
+            Glide.with(view)
+                    .asBitmap()
+                    .load(videoUri)
+                    .placeholder(R.drawable.default_image)
+                    .into(mVideo);
         }
     }
 
@@ -186,11 +201,12 @@ public class  ChatMessageListFragment extends Fragment {
             mVideo = itemView.findViewById(R.id.video_sent_holder);
         }
         public void bind(ChatMessage message){
+
             Uri videoUri = Uri.parse(message.getTextMessage());
-            MediaMetadataRetriever m = new MediaMetadataRetriever();
-            m.setDataSource(getContext(),videoUri);
-            Bitmap btm = m.getFrameAtTime();
-            mVideo.setImageBitmap(btm);
+            Glide.with(view)
+                    .asBitmap()
+                    .load(videoUri)
+                    .into(mVideo);
         }
     }
 
