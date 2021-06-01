@@ -201,7 +201,6 @@ public class  ChatMessageListFragment extends Fragment {
             mVideo = itemView.findViewById(R.id.video_sent_holder);
         }
         public void bind(ChatMessage message){
-
             Uri videoUri = Uri.parse(message.getTextMessage());
             Glide.with(view)
                     .asBitmap()

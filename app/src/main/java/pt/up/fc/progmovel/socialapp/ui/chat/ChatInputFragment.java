@@ -21,6 +21,7 @@ import java.util.List;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.ChatRepository;
+import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 
 import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 
@@ -31,6 +32,7 @@ public class ChatInputFragment extends Fragment {
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
     private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private BluetoothService mBluetoothService;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class ChatInputFragment extends Fragment {
         if(getArguments()!=null){
             mChatID = getArguments().getString(EXTRA_CHAT_ID);
         }
+        //mBluetoothService.bindService()
     }
 
     @Override
