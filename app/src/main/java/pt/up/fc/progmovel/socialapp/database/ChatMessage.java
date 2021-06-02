@@ -26,6 +26,8 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
     private String mTo;
     private String mType;
     private Long mDate;
+    @Ignore
+    private byte[] bytes;
 
     public ChatMessage() {
 
@@ -104,6 +106,9 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
             }
         }
         return  bytes;
+    }
+    public void setByte(byte[] bytes){
+        this.bytes = bytes;
     }
     @Override
     public int compareTo(ChatMessage o) {

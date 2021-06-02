@@ -27,8 +27,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -319,8 +322,38 @@ public class BluetoothService extends Service {
         mConnectThread = new ConnectThread(device);
         mConnectThread.start();
     }
+    //public
 
-    private static class ConnectedThread extends Thread {
+    public void dataReceived(byte[] bytes){
+        Object object =null;
+        ObjectInput obIn=null;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+        try {
+            obIn = new ObjectInputStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            try {
+                assert obIn != null;
+               object =  obIn.readObject();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String type = null;
+
+        if (object != null) {
+            type = object.getClass().toString();
+            Log.d(TAG, type);
+
+        }
+    }
+
+    private class ConnectedThread extends Thread {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
@@ -352,8 +385,9 @@ public class BluetoothService extends Service {
                 try {
                     Log.d(TAG, "Reading input buffer");
                     bytes = mInputStream.read(buffer);
-                    String incomingMessage = new String(buffer, 0, bytes);
-                    Log.d(TAG, incomingMessage);
+                    Log.d(TAG, "Data Received");
+                    dataReceived(buffer);
+
                 } catch (IOException e) {
                     Log.d(TAG, "Failed Reading input buffer " + e);
                     break;
