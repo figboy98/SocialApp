@@ -1,22 +1,9 @@
 package pt.up.fc.progmovel.socialapp.util;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.Application;
-import android.app.ListActivity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattServer;
-import android.bluetooth.BluetoothGattServerCallback;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothHidDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.bluetooth.le.AdvertiseCallback;
@@ -28,132 +15,89 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.ParcelUuid;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultCaller;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.ActivityResultRegistry;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-
-import com.example.socialapp.R;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.crypto.Cipher;
-
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
-
 public class BluetoothService extends Service {
-    private static final String TAG = "BLUETOOTH_LE";
+    private static final String TAG = "BLUETOOTH_SERVICE";
     private static final UUID SERVICE_UUID = UUID.fromString("e526a16e-f365-472a-87e3-a219d75ff262");
-    //   private static final UUID MESSAGE_UUID = UUID.fromString("83e9cc9e-bd68-11eb-8529-0242ac130003");
-    //  private static final UUID CONFIRM_UUID = UUID.fromString("e1fa2eaa-bebc-11eb-8529-0242ac130003");
     private static final ParcelUuid mParcelUuid = new ParcelUuid(SERVICE_UUID);
     private static final BluetoothAdapter bt = null;
     private static final ArrayList<BluetoothDevice> mBTDevices = new ArrayList<BluetoothDevice>();
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
-    private BluetoothManager mBluetoothManager;
     private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
     private BluetoothServerSocket mServerSocket;
     private BluetoothDevice mBluetoothDevice;
     private AcceptThread mAcceptThread;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    //private BluetoothGattServer mGattServer;
-    //private BluetoothGattServerCallback mGattServerCallBack;
-    //private BluetoothGatt mGattClient;
-    //private BluetoothGattCallback mGattClientCallBack;
-    //private BluetoothGattCharacteristic mBluetoothGattCharacteristic;
-    private Boolean mScanning;
-    private Handler mHandler;
+    private LeAdvertiseCallBack mLeAdvertiseCallBack;
+    private LeScanCallback mLeScanCallback;
+    private IBinder mIBinder;
+    private int mState;
+    private int mNewState;
+    //    private Handler mHandler;
     private static final long SCAN_PERIOD = 10000;
     private static final long DELAY_PERIOD = 10000;
 
     @Override
     public void onCreate() {
-        mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mBluetoothLeAdvertiser = mBluetoothAdapter.getBluetoothLeAdvertiser();
-        //mGattServerCallBack = new GattServerCallBack();
-        //mGattClientCallBack = new GattClientCallBack();
-        mHandler = new Handler();
+        mIBinder = new LocalBinder();
+        mLeAdvertiseCallBack = new LeAdvertiseCallBack();
+        mLeScanCallback = new LeScanCallback();
     }
 
+    public class LocalBinder extends Binder {
+        public BluetoothService getService() {
+            return BluetoothService.this;
+        }
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
-        return null;
+        return mIBinder;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "Bluetooth Service is running...");
         final String CHANNEL_ID = "SocialAppNotification";
-
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_baseline_search_24)
-//                .setContentTitle("SocialApp")
-//                .setContentText("Searching for data")
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-//
-//        builder.build();
-
-//
         startAdvertising();
         scanLeDevice(true);
-        start();
+        mAcceptThread = new AcceptThread();
+        mAcceptThread.start();
         return Service.START_REDELIVER_INTENT;
 
     }
 
-
-    public void sendMessage(ChatMessage message) {
-        Log.d(TAG, "Send Message");
-        byte[] data = message.getByte();
-        //mBluetoothGattCharacteristic.setValue(data);
-        //mBluetoothGattCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-
-        //boolean success = mGattClient.writeCharacteristic(mBluetoothGattCharacteristic);
-
-//        if(success){
-//            Log.d(TAG, "Message Sent");
-//        }
-//        else{
-//            Log.d(TAG, "Message not sent");
-//        }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "Bluetooth Service is stopping...");
     }
 
     private List<ScanFilter> buildScanFilters() {
@@ -190,59 +134,37 @@ public class BluetoothService extends Service {
         Log.d(TAG, "Started Advertising");
         AdvertiseSettings settings = buildAdvertisingSettings();
         AdvertiseData data = buildAdvertiseData();
-        AdvertiseCallback callback = new LeAdvertiseCallBack();
 
         if (mBluetoothLeAdvertiser != null) {
-            mBluetoothLeAdvertiser.startAdvertising(settings, data, callback);
+            mBluetoothLeAdvertiser.startAdvertising(settings, data, mLeAdvertiseCallBack);
         }
     }
 
     private void makeBluetoothConnection(BluetoothDevice device) {
 
+        //mBluetoothLeAdvertiser.stopAdvertising(mLeAdvertiseCallBack);
+        //mBluetoothLeScanner.stopScan(mLeScanCallback);
         mBTDevices.add(device);
         startClient(device);
     }
 
-    private void scanLeDevice(final boolean enable) {
+    private void scanLeDevice(boolean enable) {
         List<ScanFilter> filter = buildScanFilters();
         ScanSettings settings = buildScanSettings();
-        ScanCallback callback = new LeScanCallback();
 
 
         if (enable) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBluetoothLeScanner.stopScan(callback);
-                    Log.d(TAG, "Stopping Scan");
-
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (BluetoothDevice device : mBTDevices) {
-                                //mGattClient = device.connectGatt(getApplicationContext(), false, mGattClientCallBack);
-                            }
-
-                        }
-                    }, DELAY_PERIOD);
-                }
-            }, SCAN_PERIOD);
-
-            mScanning = true;
-            mBluetoothLeScanner.startScan(filter, settings, callback);
+            mBluetoothLeScanner.startScan(filter, settings, mLeScanCallback);
             Log.d(TAG, "Starting Scan");
 
 
         } else {
-            mScanning = false;
-            mBluetoothLeScanner.stopScan(callback);
+            mBluetoothLeScanner.stopScan(mLeScanCallback);
             Log.d(TAG, "Stopping Scan");
         }
     }
 
-    //
-    private class LeAdvertiseCallBack extends AdvertiseCallback {
+    private static class LeAdvertiseCallBack extends AdvertiseCallback {
         @Override
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
@@ -322,18 +244,17 @@ public class BluetoothService extends Service {
 
         public void run() {
             BluetoothSocket socket = null;
-            while(true){
+            while (true) {
                 try {
                     socket = mServerSocket.accept();
-                    Log.d(TAG, "Server socket accepted connection");
+                    Log.d(TAG, "Server socket accepted connection " + socket);
                 } catch (IOException e) {
                     Log.d(TAG, "Server socket Accept failed " + e);
                     break;
                 }
-            }
-            if(socket !=null){
-                connected(socket);
-
+                if (socket != null) {
+                    connected(socket);
+                }
             }
 
         }
@@ -344,121 +265,103 @@ public class BluetoothService extends Service {
                 Log.d(TAG, "Server socket close connection");
             } catch (IOException e) {
                 Log.d(TAG, "Server socket close connection failed " + e);
-
             }
         }
-
     }
 
-    private class ConnectThread extends  Thread{
+    private class ConnectThread extends Thread {
         private final BluetoothSocket mSocket;
-        private final BluetoothDevice mDevice;
+        private  final BluetoothDevice mDevice;
 
-        public ConnectThread(BluetoothDevice device){
-            mDevice = device;
+        public ConnectThread(BluetoothDevice device) {
             BluetoothSocket tmp = null;
+            mDevice = device;
 
-            try{
+            try {
                 tmp = device.createInsecureRfcommSocketToServiceRecord(SERVICE_UUID);
                 Log.d(TAG, "ConnectThread creating connection");
 
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 Log.d(TAG, "ConnectThread creating connection failed " + e);
             }
             mSocket = tmp;
         }
-        public void run(){
-            try{
+
+        public void run() {
+            try {
                 mSocket.connect();
-            }
-            catch (IOException e){
-                Log.d(TAG, "ConnectThread  connecting failed");
-                try{
+            } catch (IOException e) {
+                Log.d(TAG, "ConnectThread  connecting failed " + e);
+                try {
                     mSocket.close();
                     Log.d(TAG, "ConnectThread, closing connection after failed atempt");
-                }
-                catch (IOException e2){
+                } catch (IOException e2) {
                     Log.d(TAG, "ConnectThread, error closing connection after failed atempt " + e2);
-                    return;
-
                 }
-
+                return;
             }
             connected(mSocket);
         }
 
-        public void cancel(){
+        public void cancel() {
             try {
                 mSocket.close();
-                Log.d(TAG,"Closing ConnectThread socket");
+                Log.d(TAG, "Closing ConnectThread socket");
             } catch (IOException e) {
-                Log.d(TAG,"Closing ConnectThread socket failed " + e);
+                Log.d(TAG, "Closing ConnectThread socket failed " + e);
             }
         }
     }
 
-
-
-    public synchronized void start(){
-        if(mConnectThread!=null){
-            mConnectThread.cancel();
-            mConnectThread = null;
-        }
-        if(mAcceptThread == null){
-            mAcceptThread = new AcceptThread();
-            mAcceptThread.start();
-        }
-    }
-
-    public void startClient(BluetoothDevice device){
+    public void startClient(BluetoothDevice device) {
+        mBluetoothLeAdvertiser.stopAdvertising(mLeAdvertiseCallBack);
+        mBluetoothLeScanner.stopScan(mLeScanCallback);
         mConnectThread = new ConnectThread(device);
         mConnectThread.start();
-
     }
 
+    private static class ConnectedThread extends Thread {
+        private final BluetoothSocket mSocket;
+        private final InputStream mInputStream;
+        private final OutputStream mOutputStream;
 
-    private class ConnectedThread extends Thread{
-        private  final BluetoothSocket mSocket;
-        private  final InputStream mInputStream;
-        private  final OutputStream mOutputStream;
-
-        public ConnectedThread(BluetoothSocket socket){
+        public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
 
             Log.d(TAG, "Connected thread with device: " + socket.getRemoteDevice().getAddress());
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-            try{
+            try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
                 Log.d(TAG, "Creating input/output streams");
-            }
-            catch (IOException e){
-                Log.d(TAG, "Creating input/output streams failed "+ e);
+            } catch (IOException e) {
+                Log.d(TAG, "Creating input/output streams failed " + e);
             }
             mInputStream = tmpIn;
             mOutputStream = tmpOut;
 
         }
 
-        public void run(){
+        public void run() {
+            Log.d(TAG, "Entered run of ConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
 
-            while(true){
+            while (true) {
                 try {
-                    bytes = mInputStream.read(buffer);
-                    String incomingMessage = new String(buffer,0,bytes);
                     Log.d(TAG, "Reading input buffer");
+                    bytes = mInputStream.read(buffer);
+                    String incomingMessage = new String(buffer, 0, bytes);
+                    Log.d(TAG, incomingMessage);
                 } catch (IOException e) {
                     Log.d(TAG, "Failed Reading input buffer " + e);
                     break;
                 }
             }
-
         }
-        public void write(byte[] bytes){
+
+        public void write(byte[] bytes) {
             try {
                 mOutputStream.write(bytes);
                 Log.d(TAG, "Writing to output stream");
@@ -467,29 +370,28 @@ public class BluetoothService extends Service {
             }
 
         }
+
         public void cancel() {
-            try{
+            try {
                 mSocket.close();
                 Log.d(TAG, "Closing Connected Thread");
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 Log.d(TAG, "Closing Connected Thread Failed " + e);
             }
         }
     }
+
     private void connected(BluetoothSocket socket) {
         Log.d(TAG, "Connected function");
+
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
     }
 
-    public void write(byte[] bytes){
 
+    public void write(byte[] bytes) {
         mConnectedThread.write(bytes);
-
-
     }
-
 
 }
 

@@ -2,8 +2,14 @@ package pt.up.fc.progmovel.socialapp;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.view.View;
+import android.widget.Button;
 
 import com.example.socialapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,7 +26,9 @@ import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;
-    private static final int LOCATION_PERMISSION =2;
+    private static final int LOCATION_PERMISSION = 2;
+    private BluetoothService mBluetoothService;
+
 
     BluetoothAdapter bt;
 
@@ -28,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -50,6 +59,4 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
 }

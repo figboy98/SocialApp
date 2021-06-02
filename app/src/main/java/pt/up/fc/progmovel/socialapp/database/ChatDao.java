@@ -34,8 +34,13 @@ public interface  ChatDao {
     @Query("SELECT * FROM User WHERE UserId =:userID ")
     LiveData<UsersWithGroupChats> getUsersWithGroupChats (String userID);
 
+    @Transaction
     @Query("SELECT * FROM CHATMESSAGE ")
      LiveData<List<ChatMessage>> getChatMessages();
+
+    @Transaction
+    @Query("SELECT * FROM USER")
+    List<User> getUsers();
 
 
 

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 import pt.up.fc.progmovel.socialapp.database.GroupChat;
+import pt.up.fc.progmovel.socialapp.database.User;
 import pt.up.fc.progmovel.socialapp.database.UsersWithGroupChats;
 
 interface OnChatGroupListener{
@@ -37,23 +40,25 @@ interface OnChatGroupListener{
 }
 
 public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener  {
-    private String user2 = "6b836170-2a7e-4870-a11d-53cf7f7a440d";
-    private String user1 = "38ad0f97-592d-4577-b6d4-08dc65350767";
+    private String user2 = "166000e8-2e7a-4bea-85eb-df77cb31bbf0";
+    private String user1 = "7628926b-b074-4f4a-8cd6-968b569f5cf2";
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
     private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
     private OnChatGroupListener mChatGroupListener;
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceSate){
         super.onCreate(savedInstanceSate);
-
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), user1);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
         mChatGroupListener = (OnChatGroupListener) this;
+
+
+
+
+
     }
 
     @Override

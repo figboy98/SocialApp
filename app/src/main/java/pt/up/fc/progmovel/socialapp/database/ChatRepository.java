@@ -6,17 +6,27 @@ import android.os.AsyncTask;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class ChatRepository {
     private ChatDao chatDao;
-
-    //private LiveData<GroupChatWithMessages> chatMessages;
 
     public ChatRepository(Application application) {
         ChatDatabase database = ChatDatabase.getDatabase(application);
         chatDao = database.chatDao();
     }
 
+    public List<User> getUsers(){
+        List<User> users = null;
+        try {
+            users= new GetUsersAsyncTask(chatDao).execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return  users;
+    }
     public void insertChatMessage(ChatMessage message, String chatId) {
         new InsertChatMessageAsyncTask(chatDao).execute(message);
         GroupChatMessagesCrossRef ref = new GroupChatMessagesCrossRef(chatId,message.getChatMessageID());
@@ -113,6 +123,17 @@ public class ChatRepository {
         protected Void doInBackground(GroupChatMessagesCrossRef... groupChatMessagesCrossRefs) {
             chatDao.insertGroupChatMessagesCrossRef(groupChatMessagesCrossRefs[0]);
             return null;
+        }
+    }
+    private static class GetUsersAsyncTask extends AsyncTask<Void,Void,List<User>>{
+        private ChatDao chatDao;
+        public GetUsersAsyncTask(ChatDao dao){
+            chatDao = dao;
+        }
+
+        @Override
+        protected List<User> doInBackground(Void... voids) {
+            return chatDao.getUsers();
         }
     }
 }

@@ -1,7 +1,12 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,12 +32,13 @@ import static androidx.activity.result.ActivityResultCallerKt.registerForActivit
 
 
 public class ChatInputFragment extends Fragment {
+    private BluetoothService mBluetoothService;
     private ChatRepository mChatRepository;
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
     private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private BluetoothService mBluetoothService;
+    private Boolean mBound;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -42,8 +48,8 @@ public class ChatInputFragment extends Fragment {
         if(getArguments()!=null){
             mChatID = getArguments().getString(EXTRA_CHAT_ID);
         }
-        //mBluetoothService.bindService()
-    }
+        Intent intent = new Intent(requireContext(), BluetoothService.class);
+        requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +68,23 @@ public class ChatInputFragment extends Fragment {
         return view;
     }
 
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
+            mBluetoothService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+
     private class SentButtonClickListener implements View.OnClickListener {
 
         @Override
@@ -70,6 +93,9 @@ public class ChatInputFragment extends Fragment {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, "me", "to", "text");
                 mChatRepository.insertChatMessage(message, mChatID);
+                byte[] messageByte = message.getByte();
+
+                mBluetoothService.write(messageByte);
             }
             mInputMessage.setText("");
 
