@@ -40,8 +40,8 @@ interface OnChatGroupListener{
 }
 
 public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener  {
-    private String user2 = "166000e8-2e7a-4bea-85eb-df77cb31bbf0";
-    private String user1 = "7628926b-b074-4f4a-8cd6-968b569f5cf2";
+    private String user2 = "3057508c-32cd-4dae-956c-2d22e442e6cf";
+    private String user1 = "63b7ad0f-6a9d-4e26-a8fb-99bd3a9c9a7e";
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;

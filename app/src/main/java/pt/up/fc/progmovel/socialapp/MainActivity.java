@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-        ChatRepository repository = new ChatRepository(this.getApplication());
-
         Intent bluetooth = new Intent(this, BluetoothActivity.class);
         startActivity(bluetooth);
 

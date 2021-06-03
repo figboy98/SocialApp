@@ -27,6 +27,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,11 +57,7 @@ public class BluetoothService extends Service {
     private LeAdvertiseCallBack mLeAdvertiseCallBack;
     private LeScanCallback mLeScanCallback;
     private IBinder mIBinder;
-    private int mState;
-    private int mNewState;
-    //    private Handler mHandler;
-    private static final long SCAN_PERIOD = 10000;
-    private static final long DELAY_PERIOD = 10000;
+
 
     @Override
     public void onCreate() {
@@ -93,7 +90,7 @@ public class BluetoothService extends Service {
         scanLeDevice(true);
         mAcceptThread = new AcceptThread();
         mAcceptThread.start();
-        return Service.START_REDELIVER_INTENT;
+        return Service.START_STICKY;
 
     }
 
@@ -144,9 +141,6 @@ public class BluetoothService extends Service {
     }
 
     private void makeBluetoothConnection(BluetoothDevice device) {
-
-        //mBluetoothLeAdvertiser.stopAdvertising(mLeAdvertiseCallBack);
-        //mBluetoothLeScanner.stopScan(mLeScanCallback);
         mBTDevices.add(device);
         startClient(device);
     }
@@ -379,12 +373,22 @@ public class BluetoothService extends Service {
         public void run() {
             Log.d(TAG, "Entered run of ConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            byte[] bytes = new byte[1024];
+            InputStream object = new ByteArrayInputStream(bytes);
+            BufferedInputStream in = new BufferedInputStream(object);
 
             while (true) {
                 try {
                     Log.d(TAG, "Reading input buffer");
-                    bytes = mInputStream.read(buffer);
+                    int bytesReceived=0;
+                    int bytesToReceive=0;
+
+                    while((bytesToReceive = in.read(buffer)) >0){
+                        mInputStream.read(buffer,bytesReceived,bytesToReceive);
+                        bytesReceived+=bytesToReceive;
+                    }
+                    //in.reset();
+                    //object.reset();
                     Log.d(TAG, "Data Received");
                     dataReceived(buffer);
 
@@ -397,10 +401,19 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes) {
             try {
-                mOutputStream.write(bytes);
+                int bytesSent=0;
+                int sendBytes=0;
+                byte[] buffer = new byte[1024];
+                InputStream object = new ByteArrayInputStream(bytes);
+                BufferedInputStream in = new BufferedInputStream(object, 1024);
+                while ((sendBytes = in.read(buffer)) > 0) {
+                    mOutputStream.write(buffer, bytesSent, sendBytes);
+                    bytesSent+=sendBytes;
+                }
+
                 Log.d(TAG, "Writing to output stream");
-            } catch (IOException e) {
-                Log.d(TAG, "Writing to output stream failed " + e);
+                } catch (IOException ioException) {
+                ioException.printStackTrace();
             }
 
         }

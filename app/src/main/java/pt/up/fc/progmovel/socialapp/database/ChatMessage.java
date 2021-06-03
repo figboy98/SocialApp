@@ -112,7 +112,7 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
     }
     @Override
     public int compareTo(ChatMessage o) {
-        Long time = this.mDate -o.mDate;
+        long time = this.mDate -o.mDate;
         if(time <0){
             return -1;
         }
