@@ -5,9 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
-import pt.up.fc.progmovel.socialapp.database.ChatRepository;
+import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 
 public class ChatMessageListViewModel extends AndroidViewModel {
@@ -15,15 +14,15 @@ public class ChatMessageListViewModel extends AndroidViewModel {
     private final LiveData<GroupChatWithMessages> mGroupChatWithMessages;
 
 
-    private ChatRepository mChatRepository;
+    private SocialAppRepository mSocialAppRepository;
     private String mChatID;
 
 
     public ChatMessageListViewModel(@NonNull Application application, String chatID) {
         super(application);
         mChatID = chatID;
-        mChatRepository = new ChatRepository(application);
-        mGroupChatWithMessages = mChatRepository.getMessagesOfGroupChat(mChatID);
+        mSocialAppRepository = new SocialAppRepository(application);
+        mGroupChatWithMessages = mSocialAppRepository.getMessagesOfGroupChat(mChatID);
     }
 
     public LiveData<GroupChatWithMessages> getMessages() {

@@ -10,7 +10,7 @@ import androidx.room.Transaction;
 import java.util.List;
 
 @Dao
-public interface  ChatDao {
+public interface DatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
      void insertChatMessage(ChatMessage message);

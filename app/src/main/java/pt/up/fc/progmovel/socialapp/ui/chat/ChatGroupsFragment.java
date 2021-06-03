@@ -1,6 +1,5 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -9,20 +8,16 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.socialapp.R;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 import pt.up.fc.progmovel.socialapp.database.GroupChat;
-import pt.up.fc.progmovel.socialapp.database.User;
 import pt.up.fc.progmovel.socialapp.database.UsersWithGroupChats;
 
 interface OnChatGroupListener{
@@ -40,25 +33,23 @@ interface OnChatGroupListener{
 }
 
 public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener  {
-    private String user2 = "940ecd3e-996c-4c65-b671-d68396730168";
-    private String user1 = "60f3a6f1-be12-4bab-a768-e7e6ad7c9dad";
+    private String localUserId;
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
     private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private static final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
     private OnChatGroupListener mChatGroupListener;
 
     @Override
     public void onCreate(Bundle savedInstanceSate){
         super.onCreate(savedInstanceSate);
-        ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), user1);
+       if(getArguments()!=null){
+           localUserId = getArguments().getString(LOCAL_USER_UUID);
+       }
+        ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), localUserId);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
         mChatGroupListener = (OnChatGroupListener) this;
-
-
-
-
-
     }
 
     @Override

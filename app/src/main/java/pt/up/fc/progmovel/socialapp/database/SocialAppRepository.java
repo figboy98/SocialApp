@@ -8,20 +8,18 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class ChatRepository {
-    private ChatDao chatDao;
+public class SocialAppRepository {
+    private DatabaseDao databaseDao;
 
-    public ChatRepository(Application application) {
-        ChatDatabase database = ChatDatabase.getDatabase(application);
-        chatDao = database.chatDao();
+    public SocialAppRepository(Application application) {
+        SocialAppDatabase database = SocialAppDatabase.getDatabase(application);
+        databaseDao = database.chatDao();
     }
     public User getUser(String name){
         User user = null;
         try {
-            user=  new GetUserAsyncTask(chatDao).execute(name).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            user=  new GetUserAsyncTask(databaseDao).execute(name).get();
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return user;
@@ -30,133 +28,131 @@ public class ChatRepository {
     public List<User> getUsers(){
         List<User> users = null;
         try {
-            users= new GetUsersAsyncTask(chatDao).execute().get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+            users= new GetUsersAsyncTask(databaseDao).execute().get();
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return  users;
     }
     public void insertChatMessage(ChatMessage message, String chatId) {
-        new InsertChatMessageAsyncTask(chatDao).execute(message);
+        new InsertChatMessageAsyncTask(databaseDao).execute(message);
         GroupChatMessagesCrossRef ref = new GroupChatMessagesCrossRef(chatId,message.getChatMessageID());
-        new InsertGroupChatMessagesCrossRefAsyncTask(chatDao).execute(ref);
+        new InsertGroupChatMessagesCrossRefAsyncTask(databaseDao).execute(ref);
 
     }
 
     public void insertGroupChat(GroupChat groupChat, List<User> users) {
-        new InsertGroupChatAsyncTask(chatDao).execute(groupChat);
+        new InsertGroupChatAsyncTask(databaseDao).execute(groupChat);
 
         for(User user: users){
             GroupChatUsersCrossRef ref = new GroupChatUsersCrossRef(user.getUserID(), groupChat.getGroupChatID());
-            new InsertGroupChatUsersCrossRefAsyncTask(chatDao).execute(ref);
+            new InsertGroupChatUsersCrossRefAsyncTask(databaseDao).execute(ref);
         }
     }
 
     public void insertGroupChatMessagesCrossRef(GroupChatMessagesCrossRef groupChatMessagesCrossRef) {
-        new InsertGroupChatMessagesCrossRefAsyncTask(chatDao).execute(groupChatMessagesCrossRef);
+        new InsertGroupChatMessagesCrossRefAsyncTask(databaseDao).execute(groupChatMessagesCrossRef);
     }
 
     public void insertGroupChatUsersCrossRef(GroupChatUsersCrossRef groupChatUsersCrossRef) {
-        new InsertGroupChatUsersCrossRefAsyncTask(chatDao).execute(groupChatUsersCrossRef);
+        new InsertGroupChatUsersCrossRefAsyncTask(databaseDao).execute(groupChatUsersCrossRef);
     }
 
     public LiveData<GroupChatWithMessages> getMessagesOfGroupChat(String ID) {
-        LiveData<GroupChatWithMessages> chatMessages = chatDao.getGroupChatWithMessages(ID);
+        LiveData<GroupChatWithMessages> chatMessages = databaseDao.getGroupChatWithMessages(ID);
 
         return chatMessages;
     }
 
     public LiveData<List<ChatMessage>> getChatMessages(){
 
-        return  chatDao.getChatMessages();
+        return  databaseDao.getChatMessages();
     }
 
     public LiveData<UsersWithGroupChats> getGroupsFromUser(String ID){
         LiveData<UsersWithGroupChats> groups;
-        return chatDao.getUsersWithGroupChats(ID);
+        return databaseDao.getUsersWithGroupChats(ID);
     }
 
     private static class InsertChatMessageAsyncTask extends AsyncTask<ChatMessage, Void, Void> {
-        private ChatDao chatDao;
+        private DatabaseDao databaseDao;
 
-        private InsertChatMessageAsyncTask(ChatDao dao) {
-            chatDao = dao;
+        private InsertChatMessageAsyncTask(DatabaseDao dao) {
+            databaseDao = dao;
         }
 
         @Override
         protected Void doInBackground(ChatMessage... chatMessages) {
-            chatDao.insertChatMessage(chatMessages[0]);
+            databaseDao.insertChatMessage(chatMessages[0]);
             return null;
         }
     }
 
     private static class InsertGroupChatAsyncTask extends AsyncTask<GroupChat, Void, Void> {
-        private ChatDao chatDao;
+        private DatabaseDao databaseDao;
 
 
-        public InsertGroupChatAsyncTask(ChatDao dao) {
-            chatDao = dao;
+        public InsertGroupChatAsyncTask(DatabaseDao dao) {
+            databaseDao = dao;
         }
 
         @Override
         protected Void doInBackground(GroupChat... groupChats) {
-            chatDao.insertGroupChat(groupChats[0]);
+            databaseDao.insertGroupChat(groupChats[0]);
             return null;
         }
     }
 
     private static class InsertGroupChatUsersCrossRefAsyncTask extends AsyncTask<GroupChatUsersCrossRef, Void, Void> {
-        private ChatDao chatDao;
+        private DatabaseDao databaseDao;
 
 
-        public InsertGroupChatUsersCrossRefAsyncTask(ChatDao dao) {
-            chatDao = dao;
+        public InsertGroupChatUsersCrossRefAsyncTask(DatabaseDao dao) {
+            databaseDao = dao;
         }
 
         @Override
         protected Void doInBackground(GroupChatUsersCrossRef... groupChatUsersCrossRefs) {
-            chatDao.insertGroupChatUsersCrossRef(groupChatUsersCrossRefs[0]);
+            databaseDao.insertGroupChatUsersCrossRef(groupChatUsersCrossRefs[0]);
             return null;
         }
     }
 
     private static class InsertGroupChatMessagesCrossRefAsyncTask extends AsyncTask<GroupChatMessagesCrossRef, Void, Void> {
-        private ChatDao chatDao;
+        private DatabaseDao databaseDao;
 
-        public InsertGroupChatMessagesCrossRefAsyncTask(ChatDao dao) {
-            chatDao = dao;
+        public InsertGroupChatMessagesCrossRefAsyncTask(DatabaseDao dao) {
+            databaseDao = dao;
         }
 
 
         @Override
         protected Void doInBackground(GroupChatMessagesCrossRef... groupChatMessagesCrossRefs) {
-            chatDao.insertGroupChatMessagesCrossRef(groupChatMessagesCrossRefs[0]);
+            databaseDao.insertGroupChatMessagesCrossRef(groupChatMessagesCrossRefs[0]);
             return null;
         }
     }
     private static class GetUsersAsyncTask extends AsyncTask<Void,Void,List<User>>{
-        private ChatDao chatDao;
-        public GetUsersAsyncTask(ChatDao dao){
-            chatDao = dao;
+        private DatabaseDao databaseDao;
+        public GetUsersAsyncTask(DatabaseDao dao){
+            databaseDao = dao;
         }
 
         @Override
         protected List<User> doInBackground(Void... voids) {
-            return chatDao.getUsers();
+            return databaseDao.getUsers();
         }
     }
 
     private static class GetUserAsyncTask extends AsyncTask<String,Void,User>{
-        private ChatDao chatDao;
-        public GetUserAsyncTask(ChatDao dao){
-            chatDao = dao;
+        private DatabaseDao databaseDao;
+        public GetUserAsyncTask(DatabaseDao dao){
+            databaseDao = dao;
         }
 
         @Override
         protected User doInBackground(String... strings) {
-            return  chatDao.getUser(strings[0]);
+            return  databaseDao.getUser(strings[0]);
         }
     }
 

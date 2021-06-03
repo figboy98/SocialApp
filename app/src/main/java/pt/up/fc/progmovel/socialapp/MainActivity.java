@@ -1,16 +1,9 @@
 package pt.up.fc.progmovel.socialapp;
 
 import android.app.Activity;
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.view.View;
-import android.widget.Button;
 
 import com.example.socialapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -18,7 +11,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -26,7 +18,6 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import pt.up.fc.progmovel.socialapp.database.ChatRepository;
 import pt.up.fc.progmovel.socialapp.ui.Login;
 import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
@@ -36,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_PERMISSION = 2;
     private String mUserID;
     private BluetoothService mBluetoothService;
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
 
     BluetoothAdapter bt;
@@ -71,7 +63,12 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_home, R.id.navigation_posts, R.id.navigation_chat)
                 .build();
 
+
+
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
+
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
@@ -80,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
 
         Intent communication = new Intent(this, BluetoothService.class);
         this.startService(communication);
+
+
+        Bundle bundle = new Bundle();
+        bundle.putString(LOCAL_USER_UUID, mUserID);
+        navController.setGraph(R.navigation.mobile_navigation, bundle);
 
 
     }

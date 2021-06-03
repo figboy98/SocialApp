@@ -11,6 +11,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 @Database(
         entities = {
                 ChatMessage.class,
@@ -20,18 +22,18 @@ import org.jetbrains.annotations.NotNull;
                 GroupChatMessagesCrossRef.class,
         },
         exportSchema = false,
-        version =200
+        version =2
 )
-public  abstract class ChatDatabase extends RoomDatabase {
+public  abstract class SocialAppDatabase extends RoomDatabase {
 
-    public abstract ChatDao chatDao();
+    public abstract DatabaseDao chatDao();
 
-    volatile private static ChatDatabase db = null;
+    volatile private static SocialAppDatabase db = null;
 
-    public static synchronized ChatDatabase getDatabase(Context context){
+    public static synchronized SocialAppDatabase getDatabase(Context context){
             if(db == null){
                 db = Room.databaseBuilder(context.getApplicationContext(),
-                        ChatDatabase.class, "chat-database")
+                        SocialAppDatabase.class, "SocialApp-database")
                         .fallbackToDestructiveMigration()
                         .addCallback(roomCallback)
                         .build();
@@ -53,30 +55,32 @@ public  abstract class ChatDatabase extends RoomDatabase {
         };
 
     private static  class PopulateDbAsyncTask extends AsyncTask<Void,Void,Void> {
-        private ChatDao mChatDao;
-        private  PopulateDbAsyncTask(ChatDatabase db){
-            mChatDao = db.chatDao();
+        private DatabaseDao mDatabaseDao;
+        private  PopulateDbAsyncTask(SocialAppDatabase db){
+            mDatabaseDao = db.chatDao();
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            User user1 = new User("123","Jorge Reis");
-            User user2 = new User("124","Andreia");
-            mChatDao.insertUser(user1);
-            mChatDao.insertUser(user2);
+            String id1 = UUID.fromString("7b75907c-c4b9-11eb-8529-0242ac130003").toString();
+            String id2 = UUID.fromString("7b759450-c4b9-11eb-8529-0242ac130003").toString();
+            User user1 = new User("123","Fabio", id1);
+            User user2 = new User("124","Vasco",id2);
+            mDatabaseDao.insertUser(user1);
+            mDatabaseDao.insertUser(user2);
 
            GroupChat chat = new GroupChat("Grupo 1");
            GroupChat chat2 = new GroupChat("Grupo 2");
-            mChatDao.insertGroupChat(chat);
-            mChatDao.insertGroupChat(chat2);
+            mDatabaseDao.insertGroupChat(chat);
+            mDatabaseDao.insertGroupChat(chat2);
 
             GroupChatUsersCrossRef  g1 = new GroupChatUsersCrossRef(user1.getUserID(), chat.getGroupChatID());
             GroupChatUsersCrossRef  g2 = new GroupChatUsersCrossRef(user2.getUserID(), chat.getGroupChatID());
             GroupChatUsersCrossRef  g3 = new GroupChatUsersCrossRef(user1.getUserID(), chat2.getGroupChatID());
             GroupChatUsersCrossRef  g4 = new GroupChatUsersCrossRef(user2.getUserID(), chat2.getGroupChatID());
-            mChatDao.insertGroupChatUsersCrossRef(g1);
-            mChatDao.insertGroupChatUsersCrossRef(g2);
-            mChatDao.insertGroupChatUsersCrossRef(g3);
-            mChatDao.insertGroupChatUsersCrossRef(g4);
+            mDatabaseDao.insertGroupChatUsersCrossRef(g1);
+            mDatabaseDao.insertGroupChatUsersCrossRef(g2);
+            mDatabaseDao.insertGroupChatUsersCrossRef(g3);
+            mDatabaseDao.insertGroupChatUsersCrossRef(g4);
             return null;
         }
     }

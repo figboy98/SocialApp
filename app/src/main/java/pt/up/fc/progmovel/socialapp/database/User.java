@@ -14,8 +14,8 @@ public class User {
     private final String hwdId;
     private final String name;
 
-    public User(String hwdId, String name) {
-        userID = UUID.randomUUID().toString();
+    public User(String hwdId, String name, String userID) {
+        this.userID = userID;
         this.hwdId = hwdId;
         this.name = name;
     }

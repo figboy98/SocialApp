@@ -13,11 +13,11 @@ public class PostsViewModel extends ViewModel {
 
     public PostsViewModel() {
         Stack<Post> posts = new Stack<>();
-        posts.add(new Post(System.currentTimeMillis(), new User("123", "test_user"), "blabla"));
+        /*posts.add(new Post(System.currentTimeMillis(), new User("123", "test_user"), "blabla"));
 
         posts.add(new Post(System.currentTimeMillis(), new User("123", "test_user"), "blabla1"));
 
-        posts.add(new Post(System.currentTimeMillis(), new User("123", "test_user"), "blabla2"));
+        posts.add(new Post(System.currentTimeMillis(), new User("123", "test_user"), "blabla2"));*/
         postList.setValue(posts);
     }
 

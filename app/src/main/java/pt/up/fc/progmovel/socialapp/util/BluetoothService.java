@@ -159,7 +159,8 @@ public class BluetoothService extends Service {
             Log.d(TAG_SCAN_ADVERT, "Starting Scan");
 
 
-        } else {
+        }
+        else {
             mBluetoothLeScanner.stopScan(mLeScanCallback);
             Log.d(TAG_SCAN_ADVERT, "Stopping Scan");
         }

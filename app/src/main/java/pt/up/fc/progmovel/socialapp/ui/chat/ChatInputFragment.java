@@ -20,12 +20,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.socialapp.R;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
-import pt.up.fc.progmovel.socialapp.database.ChatRepository;
+import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 
 import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
@@ -33,7 +32,7 @@ import static androidx.activity.result.ActivityResultCallerKt.registerForActivit
 
 public class ChatInputFragment extends Fragment {
     private BluetoothService mBluetoothService;
-    private ChatRepository mChatRepository;
+    private SocialAppRepository mSocialAppRepository;
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
@@ -44,7 +43,7 @@ public class ChatInputFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
-        mChatRepository = new ChatRepository(requireActivity().getApplication());
+        mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
         if(getArguments()!=null){
             mChatID = getArguments().getString(EXTRA_CHAT_ID);
         }
@@ -92,7 +91,7 @@ public class ChatInputFragment extends Fragment {
             if (mInputMessage.toString().length() > 0) {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, "me", "to", "text");
-                mChatRepository.insertChatMessage(message, mChatID);
+                mSocialAppRepository.insertChatMessage(message, mChatID);
                 byte[] teste = new byte[100];
                 message.setByte(teste);
                 byte[] messageByte = message.getByte();
@@ -128,7 +127,7 @@ public class ChatInputFragment extends Fragment {
                                 Date date = new Date();
                                 String imagePath = result.get(i).toString();
                                 ChatMessage message = new ChatMessage(imagePath, date, "me", "to", messageType);
-                                mChatRepository.insertChatMessage(message, mChatID);
+                                mSocialAppRepository.insertChatMessage(message, mChatID);
                             }
                         }
 
