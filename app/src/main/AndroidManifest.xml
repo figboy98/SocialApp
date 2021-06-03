@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.socialapp">
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.pernission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.pernission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.pernission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.pernission.WRITE_EXTERNAL_STORAGE" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
 
-
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
+        android:isGame="false"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:isGame="false"
-        android:theme="@style/Theme.SocialApp"
-        android:fullBackupContent="@xml/backup_descriptor">
+        android:theme="@style/Theme.SocialApp">
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:label="@string/title_activity_login"></activity>
         <activity
             android:name="pt.up.fc.progmovel.socialapp.MainActivity"
             android:label="@string/title_activity_posts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="pt.up.fc.progmovel.socialapp.ui.chat.ChatActivity"
-            android:exported="true"
-        />
-        <activity android:name="pt.up.fc.progmovel.socialapp.util.BluetoothActivity"/>
+            android:exported="true" />
+        <activity android:name="pt.up.fc.progmovel.socialapp.util.BluetoothActivity" />
+        <activity android:name="pt.up.fc.progmovel.socialapp.ui.Login" />
 
-        <service android:name="pt.up.fc.progmovel.socialapp.util.BluetoothService"/>
+        <service android:name="pt.up.fc.progmovel.socialapp.util.BluetoothService" />
     </application>
-
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.GET_CONTENT" />
-            <data android:mimeType="image/*"/>
-        </intent>
-    </queries>
 
 </manifest>

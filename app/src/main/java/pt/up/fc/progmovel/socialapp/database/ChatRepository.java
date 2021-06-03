@@ -15,6 +15,17 @@ public class ChatRepository {
         ChatDatabase database = ChatDatabase.getDatabase(application);
         chatDao = database.chatDao();
     }
+    public User getUser(String name){
+        User user = null;
+        try {
+            user=  new GetUserAsyncTask(chatDao).execute(name).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
 
     public List<User> getUsers(){
         List<User> users = null;
@@ -136,4 +147,17 @@ public class ChatRepository {
             return chatDao.getUsers();
         }
     }
+
+    private static class GetUserAsyncTask extends AsyncTask<String,Void,User>{
+        private ChatDao chatDao;
+        public GetUserAsyncTask(ChatDao dao){
+            chatDao = dao;
+        }
+
+        @Override
+        protected User doInBackground(String... strings) {
+            return  chatDao.getUser(strings[0]);
+        }
+    }
+
 }

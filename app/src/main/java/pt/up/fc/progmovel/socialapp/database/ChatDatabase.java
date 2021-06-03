@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
                 GroupChatUsersCrossRef.class,
                 GroupChatMessagesCrossRef.class,
         },
+        exportSchema = false,
         version =200
 )
 public  abstract class ChatDatabase extends RoomDatabase {

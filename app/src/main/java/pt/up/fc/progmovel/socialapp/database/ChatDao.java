@@ -38,9 +38,12 @@ public interface  ChatDao {
     @Query("SELECT * FROM CHATMESSAGE ")
      LiveData<List<ChatMessage>> getChatMessages();
 
-    @Transaction
     @Query("SELECT * FROM USER")
     List<User> getUsers();
+
+
+    @Query("SELECT * FROM USER WHERE name=:name")
+    abstract User getUser(String name);
 
 
 
