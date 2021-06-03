@@ -28,7 +28,11 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
@@ -42,6 +46,7 @@ import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 
 public class BluetoothService extends Service {
     private static final String TAG = "BLUETOOTH_SERVICE";
+    private static final String TAG_SCAN_ADVERT = "BLUETOOTH_SCAN_ADVERT";
     private static final UUID SERVICE_UUID = UUID.fromString("e526a16e-f365-472a-87e3-a219d75ff262");
     private static final ParcelUuid mParcelUuid = new ParcelUuid(SERVICE_UUID);
     private static final BluetoothAdapter bt = null;
@@ -111,14 +116,14 @@ public class BluetoothService extends Service {
 
     private ScanSettings buildScanSettings() {
         return new ScanSettings.Builder()
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+                .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
                 .build();
     }
 
     private AdvertiseSettings buildAdvertisingSettings() {
         AdvertiseSettings.Builder settings = new AdvertiseSettings.Builder();
-        settings.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_POWER);
-        settings.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_LOW);
+        settings.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED);
+        settings.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM);
         settings.setTimeout(0);
         return settings.build();
     }
@@ -131,7 +136,7 @@ public class BluetoothService extends Service {
 
 
     private void startAdvertising() {
-        Log.d(TAG, "Started Advertising");
+        Log.d(TAG_SCAN_ADVERT, "Started Advertising");
         AdvertiseSettings settings = buildAdvertisingSettings();
         AdvertiseData data = buildAdvertiseData();
 
@@ -141,7 +146,6 @@ public class BluetoothService extends Service {
     }
 
     private void makeBluetoothConnection(BluetoothDevice device) {
-        mBTDevices.add(device);
         startClient(device);
     }
 
@@ -152,12 +156,12 @@ public class BluetoothService extends Service {
 
         if (enable) {
             mBluetoothLeScanner.startScan(filter, settings, mLeScanCallback);
-            Log.d(TAG, "Starting Scan");
+            Log.d(TAG_SCAN_ADVERT, "Starting Scan");
 
 
         } else {
             mBluetoothLeScanner.stopScan(mLeScanCallback);
-            Log.d(TAG, "Stopping Scan");
+            Log.d(TAG_SCAN_ADVERT, "Stopping Scan");
         }
     }
 
@@ -166,7 +170,7 @@ public class BluetoothService extends Service {
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
             String errorReason = "";
-            Log.d(TAG, "Advertising Failed ");
+            Log.d(TAG_SCAN_ADVERT, "Advertising Failed ");
             switch (errorCode) {
                 case AdvertiseCallback.ADVERTISE_FAILED_ALREADY_STARTED:
                     errorReason = "Already Started";
@@ -184,14 +188,14 @@ public class BluetoothService extends Service {
                     errorReason = "Too many advertisers";
                     break;
             }
-            Log.d(TAG, "Advertising Failed: " + errorReason);
+            Log.d(TAG_SCAN_ADVERT, "Advertising Failed: " + errorReason);
 
         }
 
         @Override
         public void onStartSuccess(AdvertiseSettings settings) {
             super.onStartSuccess(settings);
-            Log.d(TAG, "Advertising started Success");
+            Log.d(TAG_SCAN_ADVERT, "Advertising started Success");
         }
     }
 
@@ -209,18 +213,18 @@ public class BluetoothService extends Service {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            Log.d(TAG, result.toString());
+            Log.d(TAG_SCAN_ADVERT, result.toString());
             BluetoothDevice device = result.getDevice();
             if (!mBTDevices.contains(device)) {
+                mBTDevices.add(device);
                 makeBluetoothConnection(device);
-
             }
         }
 
         @Override
         public void onScanFailed(int errorCode) {
             super.onScanFailed(errorCode);
-            Log.d(TAG, "Error scanning " + errorCode);
+            Log.d(TAG_SCAN_ADVERT, "Error scanning " + errorCode);
 
         }
     }
@@ -311,39 +315,44 @@ public class BluetoothService extends Service {
     }
 
     public void startClient(BluetoothDevice device) {
-        mBluetoothLeAdvertiser.stopAdvertising(mLeAdvertiseCallBack);
-        mBluetoothLeScanner.stopScan(mLeScanCallback);
         mConnectThread = new ConnectThread(device);
         mConnectThread.start();
     }
-    //public
+
 
     public void dataReceived(byte[] bytes){
+        Log.d(TAG, "Data Received Function");
+
         Object object =null;
         ObjectInput obIn=null;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         try {
             obIn = new ObjectInputStream(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d(TAG, "Data Received: Creating object failed: " + e);
         }
 
         try {
             try {
-                assert obIn != null;
-               object =  obIn.readObject();
+                if(obIn !=null){
+                    object =  obIn.readObject();
+                }
+                else{
+                    Log.d(TAG, "Unable to open data stream");
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.d(TAG, "Data Received: Reading object failed: " + e);
+
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Log.d(TAG, "Data Received: Object class not found: " + e);
+
         }
         String type = null;
 
         if (object != null) {
             type = object.getClass().toString();
             Log.d(TAG, type);
-
         }
     }
 
@@ -371,29 +380,31 @@ public class BluetoothService extends Service {
         }
 
         public void run() {
-            Log.d(TAG, "Entered run of ConnectedThread");
-            byte[] buffer = new byte[1024];
-            byte[] bytes = new byte[1024];
-            InputStream object = new ByteArrayInputStream(bytes);
-            BufferedInputStream in = new BufferedInputStream(object);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+            byte[] data = new byte[20];
+            int current=0;
+            int bytes=0;
+            int tmp=0;
 
             while (true) {
                 try {
-                    Log.d(TAG, "Reading input buffer");
-                    int bytesReceived=0;
-                    int bytesToReceive=0;
+                    bytes = mInputStream.read(data);
+                    buffer.write(data,0, bytes);
+                    current+= bytes;
 
-                    while((bytesToReceive = in.read(buffer)) >0){
-                        mInputStream.read(buffer,bytesReceived,bytesToReceive);
-                        bytesReceived+=bytesToReceive;
-                    }
-                    //in.reset();
-                    //object.reset();
-                    Log.d(TAG, "Data Received");
-                    dataReceived(buffer);
+                    if(bytes < data.length){
+                        buffer.flush();
+                        byte[] byteArray = buffer.toByteArray();
+                        Log.d(TAG,"Bytes received total: " + current);
+                        current=0;
+                        //Function to take care of the received data
+                        dataReceived(byteArray);
+                   }
 
                 } catch (IOException e) {
                     Log.d(TAG, "Failed Reading input buffer " + e);
+                    mBTDevices.remove(mSocket.getRemoteDevice());
                     break;
                 }
             }
@@ -401,17 +412,21 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes) {
             try {
+                byte[] buffer = new byte[bytes.length];
                 int bytesSent=0;
-                int sendBytes=0;
-                byte[] buffer = new byte[1024];
-                InputStream object = new ByteArrayInputStream(bytes);
-                BufferedInputStream in = new BufferedInputStream(object, 1024);
-                while ((sendBytes = in.read(buffer)) > 0) {
-                    mOutputStream.write(buffer, bytesSent, sendBytes);
-                    bytesSent+=sendBytes;
-                }
+                int counter=0;
 
-                Log.d(TAG, "Writing to output stream");
+                Log.d(TAG, "Bytes to send: " + bytes.length);
+                //mOutputStream.write(buffer);
+                InputStream object = new ByteArrayInputStream(bytes);
+                BufferedInputStream out = new BufferedInputStream(object, 1024);
+
+                while((bytesSent = out.read(buffer))!=-1){
+                    mOutputStream.write(buffer,0,bytesSent);
+                    counter+=bytesSent;
+                }
+                Log.d(TAG, "Total bytes sent: " + counter);
+
                 } catch (IOException ioException) {
                 ioException.printStackTrace();
             }

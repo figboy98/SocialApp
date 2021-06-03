@@ -93,8 +93,9 @@ public class ChatInputFragment extends Fragment {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, "me", "to", "text");
                 mChatRepository.insertChatMessage(message, mChatID);
+                byte[] teste = new byte[100];
+                message.setByte(teste);
                 byte[] messageByte = message.getByte();
-
                 mBluetoothService.write(messageByte);
             }
             mInputMessage.setText("");
