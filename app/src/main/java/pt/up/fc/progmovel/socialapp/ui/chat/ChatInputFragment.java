@@ -1,5 +1,6 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import com.example.socialapp.R;
 import java.util.Date;
 import java.util.List;
 
+import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
@@ -38,8 +40,6 @@ public class ChatInputFragment extends Fragment {
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
-    private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
     private Boolean mBound;
     private Constants mConstants;
@@ -48,14 +48,16 @@ public class ChatInputFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConstants = new Constants();
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
         if(getArguments()!=null){
-            mChatID = getArguments().getString(EXTRA_CHAT_ID);
+            mChatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
-        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        //Activity activity = MainActivity.class.getA
 
-        localUserId = preferences.getString(LOCAL_USER_UUID, "");
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+        localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);

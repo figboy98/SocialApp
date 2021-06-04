@@ -44,6 +44,7 @@ import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class  ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
@@ -55,25 +56,25 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int IMAGE_SENT =3;
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
     private String mLocalUserId;
     private View view;
+    private Constants mConstants;
 
 
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);
+        mConstants = new Constants();
 
         String chatID = null;
         if (getArguments() != null) {
-            chatID = getArguments().getString(EXTRA_CHAT_ID);
+            chatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
 
-        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        mLocalUserId = preferences.getString(LOCAL_USER_UUID, "");
+        mLocalUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(requireActivity().getApplication(), chatID);
         mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);

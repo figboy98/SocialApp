@@ -29,6 +29,7 @@ import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.GroupChat;
 import pt.up.fc.progmovel.socialapp.database.UsersWithGroupChats;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 interface OnChatGroupListener{
     void onChatGroupClick(int position);
@@ -39,17 +40,16 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
     private OnChatGroupListener mChatGroupListener;
+    private Constants mConstants;
 
     @Override
     public void onCreate(Bundle savedInstanceSate){
         super.onCreate(savedInstanceSate);
+        mConstants = new Constants();
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
-
-        localUserId = preferences.getString(LOCAL_USER_UUID, "");
+        localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), localUserId);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
@@ -85,11 +85,9 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     @Override
     public void onChatGroupClick(int position) {
         Intent chatActivity = new Intent(getContext(), ChatActivity.class);
-        Bundle bundle = new Bundle();
         String chatID = Objects.requireNonNull(mGroups.getChatGroups().getValue()).groupChats.get(position).getGroupChatID();
-        bundle.putString(EXTRA_CHAT_ID, chatID);
-        chatActivity.putExtra(EXTRA_CHAT_ID, chatID);
-        //Toast.makeText(getContext(), "Chat Group clicked " + chatID, Toast.LENGTH_LONG).show();
+
+        chatActivity.putExtra(mConstants.EXTRA_CHAT_ID, chatID);
         startActivity(chatActivity);
 
     }
