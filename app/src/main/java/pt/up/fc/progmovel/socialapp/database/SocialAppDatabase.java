@@ -22,7 +22,7 @@ import java.util.UUID;
                 GroupChatMessagesCrossRef.class,
         },
         exportSchema = false,
-        version =2
+        version =1
 )
 public  abstract class SocialAppDatabase extends RoomDatabase {
 
@@ -67,9 +67,11 @@ public  abstract class SocialAppDatabase extends RoomDatabase {
             User user2 = new User("124","Vasco",id2);
             mDatabaseDao.insertUser(user1);
             mDatabaseDao.insertUser(user2);
+            String cId1 = UUID.fromString("94eacd18-c524-11eb-8529-0242ac130003").toString();
+            String cId2 = UUID.fromString("94eacf8e-c524-11eb-8529-0242ac130003").toString();
 
-           GroupChat chat = new GroupChat("Grupo 1");
-           GroupChat chat2 = new GroupChat("Grupo 2");
+           GroupChat chat = new GroupChat("Grupo 1",cId1);
+           GroupChat chat2 = new GroupChat("Grupo 2",cId2);
             mDatabaseDao.insertGroupChat(chat);
             mDatabaseDao.insertGroupChat(chat2);
 

@@ -15,8 +15,8 @@ public class GroupChat {
     private String groupName;
 
     public GroupChat(){}
-    public GroupChat(String name){
-        groupChatID = UUID.randomUUID().toString();
+    public GroupChat(String name, String groupChatID){
+        this.groupChatID = groupChatID;
         groupName = name;
     }
 

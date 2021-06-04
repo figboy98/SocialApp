@@ -26,6 +26,7 @@ import java.util.List;
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 
@@ -38,6 +39,7 @@ public class ChatInputFragment extends Fragment {
     private final int GET_IMAGE_CODE = 1;
     private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
     private Boolean mBound;
+    private Constants mConstants;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,9 @@ public class ChatInputFragment extends Fragment {
             mChatID = getArguments().getString(EXTRA_CHAT_ID);
         }
         Intent intent = new Intent(requireContext(), BluetoothService.class);
-        requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);    }
+        requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        mConstants = new Constants();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,7 +99,7 @@ public class ChatInputFragment extends Fragment {
                 byte[] teste = new byte[100];
                 message.setByte(teste);
                 byte[] messageByte = message.getByte();
-                mBluetoothService.write(messageByte);
+                mBluetoothService.write(messageByte,mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
             }
             mInputMessage.setText("");
 

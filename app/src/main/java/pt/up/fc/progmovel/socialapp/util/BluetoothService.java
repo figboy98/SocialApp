@@ -38,11 +38,15 @@ import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
+import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 
 public class BluetoothService extends Service {
     private static final String TAG = "BLUETOOTH_SERVICE";
@@ -62,6 +66,11 @@ public class BluetoothService extends Service {
     private LeAdvertiseCallBack mLeAdvertiseCallBack;
     private LeScanCallback mLeScanCallback;
     private IBinder mIBinder;
+    private SocialAppRepository mRepository;
+    private Constants mConstants;
+    private int code_size;
+    private Charset charset = StandardCharsets.UTF_16;
+
 
 
     @Override
@@ -73,6 +82,9 @@ public class BluetoothService extends Service {
         mIBinder = new LocalBinder();
         mLeAdvertiseCallBack = new LeAdvertiseCallBack();
         mLeScanCallback = new LeScanCallback();
+        mRepository = new SocialAppRepository(getApplication());
+        mConstants = new Constants();
+        code_size = mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE.length;
     }
 
     public class LocalBinder extends Binder {
@@ -320,10 +332,7 @@ public class BluetoothService extends Service {
         mConnectThread.start();
     }
 
-
-    public void dataReceived(byte[] bytes){
-        Log.d(TAG, "Data Received Function");
-
+    public Object byteToObject(byte[] bytes){
         Object object =null;
         ObjectInput obIn=null;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
@@ -349,18 +358,40 @@ public class BluetoothService extends Service {
             Log.d(TAG, "Data Received: Object class not found: " + e);
 
         }
+        return object;
+
+    }
+    public void dataReceived(byte[] bytes, String typeOfMessage, String id){
+        Log.d(TAG, "Data Received Function");
+
+        Object object= byteToObject(bytes);
+
         String type = null;
 
         if (object != null) {
             type = object.getClass().toString();
-            Log.d(TAG, type);
         }
+        else{
+            return;
+        }
+
+        if(type.equals("ChatMessage")){
+            Log.d(TAG, "ChatMessage Received");
+
+
+        }
+        else if(type.equals("String")){
+            Log.d(TAG, "String Received");
+        }
+
     }
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
+        private String typeOfMessage;
+        private String mGroupId;
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -382,28 +413,62 @@ public class BluetoothService extends Service {
 
         public void run() {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            int message_type = 0;
 
-            byte[] data = new byte[20];
-            int current=0;
-            int bytes=0;
-            int tmp=0;
+            byte[] data = new byte[1024];
+            int current = 0;
+            int bytes = 0;
+            byte[] tmp;
+            byte[] code;
+
 
             while (true) {
                 try {
                     bytes = mInputStream.read(data);
-                    buffer.write(data,0, bytes);
-                    current+= bytes;
+                    buffer.write(data, 0, bytes);
 
-                    if(bytes < data.length){
+                    /*
+                    beginning of message, detect type of message to be received
+                     */
+                    if (current == 0) {
+                        tmp = buffer.toByteArray();
+                        code = Arrays.copyOfRange(tmp, 0, code_size);
+                        if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
+                            typeOfMessage = mConstants.TYPE_CHAT_MESSAGE;
+                        } else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
+                            typeOfMessage = mConstants.TYPE_GROUP_CHAT_ID;
+
+                        } else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_POST)) {
+                            typeOfMessage = mConstants.TYPE_POST_MESSAGE;
+
+                        }
+                        current += bytes;
+
+                    }
+
+                    /*
+                    Check for end of message code
+                     */
+
+                    tmp = buffer.toByteArray();
+                    int size = tmp.length;
+                    code = Arrays.copyOfRange(tmp, size - code_size, size);
+
+                    if(Arrays.equals(code,mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(mConstants.TYPE_GROUP_CHAT_ID)){
+                        tmp = buffer.toByteArray();
+                        byte[] w = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
+                        mGroupId = new String(w, charset );
+                    }
+
+                    else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
                         byte[] byteArray = buffer.toByteArray();
-                        Log.d(TAG,"Bytes received total: " + current);
-                        current=0;
-                        //Function to take care of the received data
-                        dataReceived(byteArray);
-                   }
-
+                        Log.d(TAG, "End of Message, Bytes received in total: " + current);
+                        current = 0;
+                        dataReceived(byteArray, typeOfMessage, mGroupId);
+                    }
                 } catch (IOException e) {
+                    e.printStackTrace();
                     Log.d(TAG, "Failed Reading input buffer " + e);
                     mBTDevices.remove(mSocket.getRemoteDevice());
                     break;
@@ -411,7 +476,7 @@ public class BluetoothService extends Service {
             }
         }
 
-        public void write(byte[] bytes) {
+        public void write(byte[] bytes, byte[] typeOfMessage) {
             try {
                 byte[] buffer = new byte[bytes.length];
                 int bytesSent=0;
@@ -422,10 +487,13 @@ public class BluetoothService extends Service {
                 InputStream object = new ByteArrayInputStream(bytes);
                 BufferedInputStream out = new BufferedInputStream(object, 1024);
 
+                mOutputStream.write(typeOfMessage);
+
                 while((bytesSent = out.read(buffer))!=-1){
                     mOutputStream.write(buffer,0,bytesSent);
                     counter+=bytesSent;
                 }
+                mOutputStream.write(mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE);
                 Log.d(TAG, "Total bytes sent: " + counter);
 
                 } catch (IOException ioException) {
@@ -452,8 +520,8 @@ public class BluetoothService extends Service {
     }
 
 
-    public void write(byte[] bytes) {
-        mConnectedThread.write(bytes);
+    public void write(byte[] bytes, byte[] typeOfMessage) {
+        mConnectedThread.write(bytes, typeOfMessage);
     }
 
 }
