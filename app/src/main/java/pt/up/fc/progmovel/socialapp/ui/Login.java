@@ -1,6 +1,8 @@
 package pt.up.fc.progmovel.socialapp.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,7 @@ import com.example.socialapp.R;
 import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.database.User;
+import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class Login extends AppCompatActivity {
@@ -33,6 +36,10 @@ public class Login extends AppCompatActivity {
         nameInput = findViewById(R.id.login_name_input);
         Button loginButton = findViewById(R.id.login_button);
 
+        Intent communication = new Intent(this, BluetoothService.class);
+        this.startService(communication);
+
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,9 +48,11 @@ public class Login extends AppCompatActivity {
 
                     mUser = mSocialAppRepository.getUser(name);
                     if (mUser != null) {
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra(mConstants.EXTRA_USER_ID, mUser.getUserID());
-                        setResult(MainActivity.RESULT_OK,resultIntent);
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString(mConstants.SHARED_LOCAL_USER_ID, mUser.getUserID()).apply();
+                        startActivity(intent);
                         finish();
                     } else {
                         Toast.makeText(Login.this, "Wrong Username", Toast.LENGTH_LONG).show();

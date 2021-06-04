@@ -28,7 +28,7 @@ import pt.up.fc.progmovel.socialapp.util.Constants;
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;
     private static final int LOCATION_PERMISSION = 2;
-    private String mUserID;
+    private String mLocalUserId;
     private BluetoothService mBluetoothService;
     private Constants mConstants;
 
@@ -42,27 +42,9 @@ public class MainActivity extends AppCompatActivity {
         mConstants = new Constants();
         Intent login = new Intent(this, Login.class);
 
+        SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-
-        ActivityResultLauncher<Intent> loginActivity = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            if(data!=null){
-                                mUserID = data.getStringExtra(mConstants.EXTRA_USER_ID);
-                                SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString(mConstants.SHARED_LOCAL_USER_ID, mUserID).apply();
-                            }
-                        }
-                    }
-                });
-
-        loginActivity.launch(login);
-
+        mLocalUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -81,12 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent bluetooth = new Intent(this, BluetoothActivity.class);
         startActivity(bluetooth);
-
-        Intent communication = new Intent(this, BluetoothService.class);
-        this.startService(communication);
-
-
-
 
     }
 }

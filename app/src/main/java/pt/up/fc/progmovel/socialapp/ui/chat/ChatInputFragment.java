@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.socialapp.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -51,12 +56,11 @@ public class ChatInputFragment extends Fragment {
         mConstants = new Constants();
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
-        if(getArguments()!=null){
+        if (getArguments() != null) {
             mChatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
-        //Activity activity = MainActivity.class.getA
 
-        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         Intent intent = new Intent(requireContext(), BluetoothService.class);
@@ -106,10 +110,8 @@ public class ChatInputFragment extends Fragment {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, localUserId, mChatID, "text");
                 mSocialAppRepository.insertChatMessage(message);
-                byte[] teste = new byte[10000];
-                message.setByte(teste);
                 byte[] messageByte = message.getByte();
-                mBluetoothService.write(messageByte,mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                mBluetoothService.write(messageByte, mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
             }
             mInputMessage.setText("");
 
@@ -118,7 +120,7 @@ public class ChatInputFragment extends Fragment {
     }
 
     private class ImagesButtonClickListener implements View.OnClickListener {
-        private String mType;
+        private final String mType;
 
         public ImagesButtonClickListener(String type) {
             mType = type;
@@ -141,6 +143,26 @@ public class ChatInputFragment extends Fragment {
                                 String imagePath = result.get(i).toString();
                                 ChatMessage message = new ChatMessage(imagePath, date, localUserId, mChatID, messageType);
                                 mSocialAppRepository.insertChatMessage(message);
+                                try {
+                                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), result.get(i));
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                                    byte[] data = baos.toByteArray();
+
+                                    /*Save media bytes to the message to make it easier to send with Bluetooth */
+
+                                    message.setByte(data);
+
+                                    mBluetoothService.write(message.getByte(), mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+
+                                    /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
+                                    then its saved to the storage */
+
+                                    message.setByte(new byte[0]);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
 

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,6 +41,8 @@ public class BluetoothActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT =2;
     private static final int REQUEST_ENABLE_LOCATION =3;
     private static final int REQUEST_DISCOVERY = 4;
+    private static  final int REQUEST_WRITE = 5;
+    private static final int REQUEST_READ = 6;
     private BluetoothAdapter mBluetoothAdapter = null;
     private BluetoothService mBluetoothServive = null;
     private LocationManager mLocationManager = null;
@@ -47,11 +50,14 @@ public class BluetoothActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> requestBTDiscovery;
     private ActivityResultLauncher<String> requestCoarseLocation;
     private ActivityResultLauncher<String> requestFineLocation;
-
+    private ActivityResultLauncher<String> requestWritePermission;
+    private ActivityResultLauncher<String> requestReadPermission;
     boolean bluetoothUsePermission = false;
     boolean bluetoothDiscoveryPermission = false;
     boolean coarseLocationPermission = false;
     boolean fineLocationPermission = false;
+    boolean writePermission = false;
+    boolean readPermission = false;
 
 
     @Override
@@ -88,11 +94,16 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
+        requestWritePermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->{
+            if(isGranted){
+                writePermission = true;
+            }
+        });
+        requestReadPermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(),isGranted ->{
+            if(isGranted){
+                readPermission = true;
+            }
+        });
 
     }
     @Override
@@ -198,6 +209,14 @@ public class BluetoothActivity extends AppCompatActivity {
             fineLocationPermission = true;
         }
 
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            writePermission = true;
+        }
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            readPermission = true;
+        }
+
+
         if(!bluetoothUsePermission) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.BLUETOOTH)) {
@@ -234,6 +253,26 @@ public class BluetoothActivity extends AppCompatActivity {
             }
             requestFineLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION);
 
+        }
+        if(!writePermission){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if(shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    //Inform the user of the necessity of this permission
+                }
+            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_WRITE);
+
+           // requestWritePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if(!readPermission){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if(shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                    //Inform the user of the necessity of this permission
+                }
+            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_READ);
+
+           // requestWritePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
 
