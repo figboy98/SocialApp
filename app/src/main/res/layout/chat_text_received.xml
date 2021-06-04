@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:background="@color/design_default_color_primary"
         android:textColor="@android:color/black"
-        android:textSize="14sp"
+        android:textSize="20sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toRightOf="@id/left_guideline_sent_text"
