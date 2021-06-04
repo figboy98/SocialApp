@@ -357,8 +357,7 @@ public class BluetoothService extends Service {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
-        private String typeOfMessage;
-        private String mGroupId;
+        //private String mGroupId;
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -381,8 +380,9 @@ public class BluetoothService extends Service {
         public void run() {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int message_type = 0;
+            //String typeOfMessage;
 
-            byte[] data = new byte[1024];
+            byte[] data = new byte[20*1024];
             int current = 0;
             int bytes = 0;
             byte[] tmp;
@@ -398,22 +398,19 @@ public class BluetoothService extends Service {
                     /*
                     beginning of message, detect type of message to be received
                      */
-                    if (current == 0) {
+                   /* if (current == 0) {
                         tmp = buffer.toByteArray();
                         code = Arrays.copyOfRange(tmp, 0, code_size);
 
                         if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
                             typeOfMessage = Constants.TYPE_CHAT_MESSAGE;
                         }
-                        else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
-                            typeOfMessage = Constants.TYPE_GROUP_CHAT_ID;
-
-                        }
                         else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_POST)) {
                             typeOfMessage = Constants.TYPE_POST_MESSAGE;
 
                         }
-                    }
+                    } */
+
                     current += bytes;
 
                     /*
@@ -424,15 +421,15 @@ public class BluetoothService extends Service {
                     int size = tmp.length;
                     code = Arrays.copyOfRange(tmp, size - code_size, size);
 
-                    if(Arrays.equals(code,Constants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(Constants.TYPE_GROUP_CHAT_ID)){
+                    /*if(Arrays.equals(code,Constants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(Constants.TYPE_GROUP_CHAT_ID)){
                         tmp = buffer.toByteArray();
                         messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
                         mGroupId = new String(messageArray, charset );
                         current =0;
                         buffer.reset();
-                    }
+                    } */
 
-                    else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
+                    if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
                         tmp = buffer.toByteArray();
                         messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
@@ -453,12 +450,13 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes, byte[] typeOfMessage) {
             try {
-                byte[] buffer = new byte[bytes.length];
+                byte[] buffer = new byte[10*1024];
                 int bytesSent=0;
                 int counter=0;
 
                 Log.d(TAG, "Bytes to send: " + bytes.length);
                 //mOutputStream.write(buffer);
+
                 InputStream object = new ByteArrayInputStream(bytes);
                 BufferedInputStream out = new BufferedInputStream(object, 1024);
 

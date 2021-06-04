@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,10 @@ import androidx.fragment.app.Fragment;
 import com.example.socialapp.R;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +44,7 @@ import static androidx.activity.result.ActivityResultCallerKt.registerForActivit
 
 
 public class ChatInputFragment extends Fragment {
+    private static final String TAG = "BLUETOOTH_SERVICE";
     private static BluetoothService mBluetoothService;
     private static SocialAppRepository mSocialAppRepository;
     private String mChatID;
@@ -189,9 +194,29 @@ public class ChatInputFragment extends Fragment {
                     message.setByte(new byte[0]);
 
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.d(TAG, "Error transforming image in bytes: " +e);
+
                 }
 
+            }
+            else if(type.equals("video")){
+                Bitmap bitmap = null;
+                try {
+                   ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+                   String path = Uri.parse(message.getTextMessage()).getPath();
+                   InputStream inputStream = activities[0].getContentResolver().openInputStream(Uri.parse(message.getTextMessage()));
+                   byte[] buffer = new byte[1024];
+                   int n;
+                   while (-1 != (n = inputStream.read(buffer)))
+                        baos.write(buffer, 0, n);
+
+                    byte[] data = baos.toByteArray();
+                    message.setByte(data);
+                    sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                    message.setByte(new byte[0]);
+                } catch (IOException e) {
+                    Log.d(TAG, "Error transforming video in bytes: " +e);
+                }
             }
             if (sent) {
                 mSocialAppRepository.insertChatMessage(message);
