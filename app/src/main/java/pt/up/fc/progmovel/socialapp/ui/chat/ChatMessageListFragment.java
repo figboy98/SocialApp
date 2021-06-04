@@ -3,6 +3,7 @@ package pt.up.fc.progmovel.socialapp.ui.chat;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
@@ -55,10 +56,9 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
     private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
+    private String mLocalUserId;
     private View view;
-
-
-   // Application mApplication = requireActivity().getApplication();
 
 
 
@@ -70,6 +70,10 @@ public class  ChatMessageListFragment extends Fragment {
         if (getArguments() != null) {
             chatID = getArguments().getString(EXTRA_CHAT_ID);
         }
+
+        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+
+        mLocalUserId = preferences.getString(LOCAL_USER_UUID, "");
 
         ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(requireActivity().getApplication(), chatID);
         mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
@@ -228,7 +232,7 @@ public class  ChatMessageListFragment extends Fragment {
              String from = message.getFrom();
 
             if(type.equals("text")){
-                if(from.equals("me")){
+                if(from.equals(mLocalUserId)){
                     return TEXT_SENT;
                 }
                 else{
@@ -236,7 +240,7 @@ public class  ChatMessageListFragment extends Fragment {
                 }
             }
             else if(type.equals("image")){
-                if(from.equals("me")){
+                if(from.equals(mLocalUserId)){
                     return IMAGE_SENT;
                 }
                 else{
@@ -244,7 +248,7 @@ public class  ChatMessageListFragment extends Fragment {
                 }
             }
             else if(type.equals("video")){
-                if(from.equals("me")){
+                if(from.equals(mLocalUserId)){
                     return VIDEO_SENT;
                 }
                 else{

@@ -361,7 +361,7 @@ public class BluetoothService extends Service {
         return object;
 
     }
-    public void dataReceived(byte[] bytes, String typeOfMessage, String id){
+    public void dataReceived(byte[] bytes){
         Log.d(TAG, "Data Received Function");
 
         Object object= byteToObject(bytes);
@@ -375,9 +375,10 @@ public class BluetoothService extends Service {
             return;
         }
 
-        if(type.equals("ChatMessage")){
+        if(type.equals("class pt.up.fc.progmovel.socialapp.database.ChatMessage")){
             Log.d(TAG, "ChatMessage Received");
-
+            ChatMessage message = (ChatMessage) object;
+            mRepository.insertChatMessage(message);
 
         }
         else if(type.equals("String")){
@@ -420,6 +421,7 @@ public class BluetoothService extends Service {
             int bytes = 0;
             byte[] tmp;
             byte[] code;
+            byte[] messageArray;
 
 
             while (true) {
@@ -433,18 +435,20 @@ public class BluetoothService extends Service {
                     if (current == 0) {
                         tmp = buffer.toByteArray();
                         code = Arrays.copyOfRange(tmp, 0, code_size);
+
                         if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
                             typeOfMessage = mConstants.TYPE_CHAT_MESSAGE;
-                        } else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
+                        }
+                        else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
                             typeOfMessage = mConstants.TYPE_GROUP_CHAT_ID;
 
-                        } else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_POST)) {
+                        }
+                        else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_POST)) {
                             typeOfMessage = mConstants.TYPE_POST_MESSAGE;
 
                         }
-                        current += bytes;
-
                     }
+                    current += bytes;
 
                     /*
                     Check for end of message code
@@ -456,16 +460,21 @@ public class BluetoothService extends Service {
 
                     if(Arrays.equals(code,mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(mConstants.TYPE_GROUP_CHAT_ID)){
                         tmp = buffer.toByteArray();
-                        byte[] w = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
-                        mGroupId = new String(w, charset );
+                        messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
+                        mGroupId = new String(messageArray, charset );
+                        current =0;
+                        buffer.reset();
                     }
 
                     else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
-                        byte[] byteArray = buffer.toByteArray();
+                        tmp = buffer.toByteArray();
+                        messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
+
                         Log.d(TAG, "End of Message, Bytes received in total: " + current);
                         current = 0;
-                        dataReceived(byteArray, typeOfMessage, mGroupId);
+                        buffer.reset();
+                        dataReceived(messageArray);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -493,6 +502,7 @@ public class BluetoothService extends Service {
                     mOutputStream.write(buffer,0,bytesSent);
                     counter+=bytesSent;
                 }
+
                 mOutputStream.write(mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE);
                 Log.d(TAG, "Total bytes sent: " + counter);
 

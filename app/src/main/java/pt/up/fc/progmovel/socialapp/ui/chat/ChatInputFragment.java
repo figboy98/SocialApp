@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -38,8 +39,11 @@ public class ChatInputFragment extends Fragment {
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
     private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
+
     private Boolean mBound;
     private Constants mConstants;
+    private String localUserId;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,10 @@ public class ChatInputFragment extends Fragment {
         if(getArguments()!=null){
             mChatID = getArguments().getString(EXTRA_CHAT_ID);
         }
+        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+
+        localUserId = preferences.getString(LOCAL_USER_UUID, "");
+
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
         mConstants = new Constants();
@@ -94,9 +102,9 @@ public class ChatInputFragment extends Fragment {
         public void onClick(View v) {
             if (mInputMessage.toString().length() > 0) {
                 Date date = new Date();
-                ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, "me", "to", "text");
-                mSocialAppRepository.insertChatMessage(message, mChatID);
-                byte[] teste = new byte[100];
+                ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, localUserId, mChatID, "text");
+                mSocialAppRepository.insertChatMessage(message);
+                byte[] teste = new byte[10000];
                 message.setByte(teste);
                 byte[] messageByte = message.getByte();
                 mBluetoothService.write(messageByte,mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
@@ -125,13 +133,12 @@ public class ChatInputFragment extends Fragment {
                             messageType = "video";
                         }
 
-
                         if (result.size() > 0) {
                             for (int i = 0; i < result.size(); i++) {
                                 Date date = new Date();
                                 String imagePath = result.get(i).toString();
-                                ChatMessage message = new ChatMessage(imagePath, date, "me", "to", messageType);
-                                mSocialAppRepository.insertChatMessage(message, mChatID);
+                                ChatMessage message = new ChatMessage(imagePath, date, localUserId, mChatID, messageType);
+                                mSocialAppRepository.insertChatMessage(message);
                             }
                         }
 

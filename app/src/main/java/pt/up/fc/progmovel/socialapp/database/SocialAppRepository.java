@@ -34,7 +34,8 @@ public class SocialAppRepository {
         }
         return  users;
     }
-    public void insertChatMessage(ChatMessage message, String chatId) {
+    public void insertChatMessage(ChatMessage message) {
+        String chatId = message.getTo();
         new InsertChatMessageAsyncTask(databaseDao).execute(message);
         GroupChatMessagesCrossRef ref = new GroupChatMessagesCrossRef(chatId,message.getChatMessageID());
         new InsertGroupChatMessagesCrossRefAsyncTask(databaseDao).execute(ref);
