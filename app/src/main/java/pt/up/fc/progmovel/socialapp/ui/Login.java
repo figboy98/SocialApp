@@ -20,6 +20,8 @@ public class Login extends AppCompatActivity {
     private EditText nameInput;
     private SocialAppRepository mSocialAppRepository;
     private User mUser;
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +40,8 @@ public class Login extends AppCompatActivity {
                     mUser = mSocialAppRepository.getUser(name);
                     if (mUser != null) {
                         Intent resultIntent = new Intent();
-                        resultIntent.putExtra("EXTRA_USER_ID", mUser.getUserID());
-                        setResult(MainActivity.RESULT_OK);
+                        resultIntent.putExtra(LOCAL_USER_UUID, mUser.getUserID());
+                        setResult(MainActivity.RESULT_OK,resultIntent);
                         finish();
                     } else {
                         Toast.makeText(Login.this, "Wrong Username", Toast.LENGTH_LONG).show();

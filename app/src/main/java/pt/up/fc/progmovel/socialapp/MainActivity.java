@@ -2,7 +2,9 @@ package pt.up.fc.progmovel.socialapp;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.socialapp.R;
@@ -44,10 +46,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == Activity.RESULT_OK) {
-                            // Here, no request code
                             Intent data = result.getData();
                             if(data!=null){
-                                 mUserID = data.getDataString();
+                                mUserID = data.getStringExtra(LOCAL_USER_UUID);
+                                SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.putString(LOCAL_USER_UUID, mUserID).commit();
                             }
                         }
                     }
@@ -65,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
 
@@ -79,9 +82,6 @@ public class MainActivity extends AppCompatActivity {
         this.startService(communication);
 
 
-        Bundle bundle = new Bundle();
-        bundle.putString(LOCAL_USER_UUID, mUserID);
-        navController.setGraph(R.navigation.mobile_navigation, bundle);
 
 
     }

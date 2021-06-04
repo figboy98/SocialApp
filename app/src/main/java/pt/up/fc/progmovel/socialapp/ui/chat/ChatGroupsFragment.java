@@ -1,6 +1,8 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,15 +40,17 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
     private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private static final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
     private OnChatGroupListener mChatGroupListener;
 
     @Override
     public void onCreate(Bundle savedInstanceSate){
         super.onCreate(savedInstanceSate);
-       if(getArguments()!=null){
-           localUserId = getArguments().getString(LOCAL_USER_UUID);
-       }
+
+        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+
+        localUserId = preferences.getString(LOCAL_USER_UUID, "");
+
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), localUserId);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
         mChatGroupListener = (OnChatGroupListener) this;
