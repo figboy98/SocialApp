@@ -24,8 +24,7 @@ public class ChatActivity extends FragmentActivity {
     private String mChatID;
     private HomeViewModel homeViewModel;
     private BluetoothService mBluetoothService;
-    private Boolean mBound=false;
-    private Constants mConstants;
+    private Boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -33,7 +32,6 @@ public class ChatActivity extends FragmentActivity {
         setContentView(R.layout.activity_chat);
         Intent intent = getIntent();
         mChatID = intent.getStringExtra(EXTRA_CHAT_ID);
-        mConstants = new Constants();
 
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_CHAT_ID, mChatID);
@@ -67,9 +65,6 @@ public class ChatActivity extends FragmentActivity {
 
         Fragment messagesList = new ChatMessageListFragment();
         messagesList.setArguments(bundle);
-
-
-
 
         fm.beginTransaction()
                     .replace(R.id.chat_message_input_placeholder, inputChat)

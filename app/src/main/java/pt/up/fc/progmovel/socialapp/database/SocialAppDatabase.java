@@ -24,7 +24,7 @@ import java.util.UUID;
         exportSchema = false,
         version =1
 )
-public  abstract class SocialAppDatabase extends RoomDatabase {
+public abstract class SocialAppDatabase extends RoomDatabase {
 
     public abstract DatabaseDao chatDao();
 

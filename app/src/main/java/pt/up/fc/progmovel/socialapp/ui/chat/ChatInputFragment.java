@@ -42,10 +42,7 @@ public class ChatInputFragment extends Fragment {
     private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
     private Boolean mBound;
-    private Constants mConstants;
     private String localUserId;
-
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
@@ -59,7 +56,6 @@ public class ChatInputFragment extends Fragment {
 
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        mConstants = new Constants();
     }
 
     @Override
@@ -107,7 +103,7 @@ public class ChatInputFragment extends Fragment {
                 byte[] teste = new byte[10000];
                 message.setByte(teste);
                 byte[] messageByte = message.getByte();
-                mBluetoothService.write(messageByte,mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                mBluetoothService.write(messageByte,Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
             }
             mInputMessage.setText("");
 

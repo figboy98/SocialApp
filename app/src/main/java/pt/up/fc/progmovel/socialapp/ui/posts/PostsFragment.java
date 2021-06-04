@@ -35,8 +35,6 @@ public class PostsFragment extends Fragment {
         Observer<Stack<Post>> postsObserver = this::updateUI;
         postsViewModel.getPost().observe(getViewLifecycleOwner(), postsObserver);
 
-
-
         return view;
     }
 

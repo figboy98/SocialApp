@@ -42,17 +42,14 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityResultLauncher<Intent> loginActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            Intent data = result.getData();
-                            if(data!=null){
-                                mUserID = data.getStringExtra(LOCAL_USER_UUID);
-                                SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = preferences.edit();
-                                editor.putString(LOCAL_USER_UUID, mUserID).commit();
-                            }
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if(data!=null){
+                            mUserID = data.getStringExtra(LOCAL_USER_UUID);
+                            SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString(LOCAL_USER_UUID, mUserID).commit();
                         }
                     }
                 });

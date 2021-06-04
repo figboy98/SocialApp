@@ -60,8 +60,6 @@ public class  ChatMessageListFragment extends Fragment {
     private String mLocalUserId;
     private View view;
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);

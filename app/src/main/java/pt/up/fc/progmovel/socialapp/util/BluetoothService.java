@@ -54,7 +54,7 @@ public class BluetoothService extends Service {
     private static final UUID SERVICE_UUID = UUID.fromString("e526a16e-f365-472a-87e3-a219d75ff262");
     private static final ParcelUuid mParcelUuid = new ParcelUuid(SERVICE_UUID);
     private static final BluetoothAdapter bt = null;
-    private static final ArrayList<BluetoothDevice> mBTDevices = new ArrayList<BluetoothDevice>();
+    private static final ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
@@ -67,11 +67,8 @@ public class BluetoothService extends Service {
     private LeScanCallback mLeScanCallback;
     private IBinder mIBinder;
     private SocialAppRepository mRepository;
-    private Constants mConstants;
     private int code_size;
-    private Charset charset = StandardCharsets.UTF_16;
-
-
+    private final Charset charset = StandardCharsets.UTF_16;
 
     @Override
     public void onCreate() {
@@ -83,8 +80,7 @@ public class BluetoothService extends Service {
         mLeAdvertiseCallBack = new LeAdvertiseCallBack();
         mLeScanCallback = new LeScanCallback();
         mRepository = new SocialAppRepository(getApplication());
-        mConstants = new Constants();
-        code_size = mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE.length;
+        code_size = Constants.BLUETOOTH_TYPE_CHAT_MESSAGE.length;
     }
 
     public class LocalBinder extends Binder {
@@ -101,14 +97,16 @@ public class BluetoothService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "Bluetooth Service is running...");
-        final String CHANNEL_ID = "SocialAppNotification";
-        startAdvertising();
-        scanLeDevice(true);
-        mAcceptThread = new AcceptThread();
-        mAcceptThread.start();
-        return Service.START_STICKY;
+        if(mBluetoothAdapter.isEnabled()) {
+            Log.d(TAG, "Bluetooth Service is running...");
+            final String CHANNEL_ID = "SocialAppNotification";
+            startAdvertising();
+            scanLeDevice(true);
+            mAcceptThread = new AcceptThread();
+            mAcceptThread.start();
+        }
 
+        return Service.START_STICKY;
     }
 
     @Override
@@ -436,15 +434,15 @@ public class BluetoothService extends Service {
                         tmp = buffer.toByteArray();
                         code = Arrays.copyOfRange(tmp, 0, code_size);
 
-                        if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
-                            typeOfMessage = mConstants.TYPE_CHAT_MESSAGE;
+                        if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
+                            typeOfMessage = Constants.TYPE_CHAT_MESSAGE;
                         }
-                        else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
-                            typeOfMessage = mConstants.TYPE_GROUP_CHAT_ID;
+                        else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE)) {
+                            typeOfMessage = Constants.TYPE_GROUP_CHAT_ID;
 
                         }
-                        else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_POST)) {
-                            typeOfMessage = mConstants.TYPE_POST_MESSAGE;
+                        else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_POST)) {
+                            typeOfMessage = Constants.TYPE_POST_MESSAGE;
 
                         }
                     }
@@ -458,7 +456,7 @@ public class BluetoothService extends Service {
                     int size = tmp.length;
                     code = Arrays.copyOfRange(tmp, size - code_size, size);
 
-                    if(Arrays.equals(code,mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(mConstants.TYPE_GROUP_CHAT_ID)){
+                    if(Arrays.equals(code,Constants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(Constants.TYPE_GROUP_CHAT_ID)){
                         tmp = buffer.toByteArray();
                         messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
                         mGroupId = new String(messageArray, charset );
@@ -466,7 +464,7 @@ public class BluetoothService extends Service {
                         buffer.reset();
                     }
 
-                    else if (Arrays.equals(code, mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
+                    else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
                         tmp = buffer.toByteArray();
                         messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
@@ -503,7 +501,7 @@ public class BluetoothService extends Service {
                     counter+=bytesSent;
                 }
 
-                mOutputStream.write(mConstants.BLUETOOTH_TYPE_END_OF_MESSAGE);
+                mOutputStream.write(Constants.BLUETOOTH_TYPE_END_OF_MESSAGE);
                 Log.d(TAG, "Total bytes sent: " + counter);
 
                 } catch (IOException ioException) {
