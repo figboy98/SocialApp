@@ -50,11 +50,10 @@ public class ChatInputFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConstants = new Constants();
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
         if (getArguments() != null) {
-            mChatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
+            mChatID = getArguments().getString(Constants.EXTRA_CHAT_ID);
         }
         //Activity activity = MainActivity.class.getA
 

@@ -14,6 +14,8 @@ public class Constants {
     public static final String TYPE_GROUP_CHAT_ID = "GroupId";
     public static final String TYPE_POST_MESSAGE = "PostMessage";
 
+    public static final
+
 
     public Constants(){
 
