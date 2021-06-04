@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -39,8 +40,8 @@ import static androidx.activity.result.ActivityResultCallerKt.registerForActivit
 
 
 public class ChatInputFragment extends Fragment {
-    private BluetoothService mBluetoothService;
-    private SocialAppRepository mSocialAppRepository;
+    private static BluetoothService mBluetoothService;
+    private static SocialAppRepository mSocialAppRepository;
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
@@ -48,6 +49,7 @@ public class ChatInputFragment extends Fragment {
     private Boolean mBound;
     private String localUserId;
     private ServiceConnection connection;
+    private  View view;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,6 @@ public class ChatInputFragment extends Fragment {
 
         SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
-
 
 
         connection = new ServiceConnection() {
@@ -88,7 +89,7 @@ public class ChatInputFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat_input, container, false);
+        view = inflater.inflate(R.layout.fragment_chat_input, container, false);
 
         mInputMessage = view.findViewById(R.id.chat_message_input);
         ImageButton sendButton = view.findViewById(R.id.send_image_button);
@@ -110,13 +111,9 @@ public class ChatInputFragment extends Fragment {
             if (mInputMessage.toString().length() > 0) {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, localUserId, mChatID, "text");
-                mSocialAppRepository.insertChatMessage(message);
-                byte[] messageByte = message.getByte();
-                mBluetoothService.write(messageByte,Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                new SendMessageAsyncTask(message).execute(requireActivity());
             }
             mInputMessage.setText("");
-
-
         }
     }
 
@@ -143,27 +140,7 @@ public class ChatInputFragment extends Fragment {
                                 Date date = new Date();
                                 String imagePath = result.get(i).toString();
                                 ChatMessage message = new ChatMessage(imagePath, date, localUserId, mChatID, messageType);
-                                mSocialAppRepository.insertChatMessage(message);
-                                try {
-                                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), result.get(i));
-                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-                                    byte[] data = baos.toByteArray();
-
-                                    /*Save media bytes to the message to make it easier to send with Bluetooth */
-
-                                    message.setByte(data);
-
-                                    mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
-
-                                    /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
-                                    then its saved to the storage */
-
-                                    message.setByte(new byte[0]);
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                new SendMessageAsyncTask(message).execute(requireActivity());
                             }
                         }
 
@@ -173,6 +150,53 @@ public class ChatInputFragment extends Fragment {
         @Override
         public void onClick(View v) {
             mGetContent.launch(mType);
+        }
+    }
+    private static class SendMessageAsyncTask extends AsyncTask<Activity, Void, Void> {
+        ChatMessage message;
+        String type;
+
+        SendMessageAsyncTask(ChatMessage message) {
+            this.message = message;
+            type = message.getType();
+        }
+
+        @Override
+        protected Void doInBackground(Activity... activities) {
+            boolean sent=false;
+            if (type.equals("text")) {
+                byte[] messageByte = message.getByte();
+                sent = mBluetoothService.write(messageByte, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+
+            }
+            else if(type.equals("image")){
+                mSocialAppRepository.insertChatMessage(message);
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activities[0].getContentResolver(), Uri.parse(message.getTextMessage()));
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                    byte[] data = baos.toByteArray();
+
+                    /*Save media bytes to the message to make it easier to send with Bluetooth */
+
+                    message.setByte(data);
+
+                    sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+
+                    /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
+                    then its saved to the storage */
+
+                    message.setByte(new byte[0]);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            if (sent) {
+                mSocialAppRepository.insertChatMessage(message);
+            }
+            return null;
         }
     }
 }

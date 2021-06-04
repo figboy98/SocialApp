@@ -34,6 +34,7 @@ import android.os.Message;
 import android.os.ParcelUuid;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -495,8 +496,14 @@ public class BluetoothService extends Service {
     }
 
 
-    public void write(byte[] bytes, byte[] typeOfMessage) {
+    public boolean write(byte[] bytes, byte[] typeOfMessage) {
+        if(mConnectedThread==null){
+           // Toast.makeText(getApplicationContext(), "No Bluetooth connection", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         mConnectedThread.write(bytes, typeOfMessage);
+        return true;
     }
 
     public void verifyWriteReadPermissions() {
