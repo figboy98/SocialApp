@@ -46,10 +46,9 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     @Override
     public void onCreate(Bundle savedInstanceSate){
         super.onCreate(savedInstanceSate);
-        mConstants = new Constants();
-        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+        SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
+        localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), localUserId);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
@@ -87,7 +86,7 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
         Intent chatActivity = new Intent(getContext(), ChatActivity.class);
         String chatID = Objects.requireNonNull(mGroups.getChatGroups().getValue()).groupChats.get(position).getGroupChatID();
 
-        chatActivity.putExtra(mConstants.EXTRA_CHAT_ID, chatID);
+        chatActivity.putExtra(Constants.EXTRA_CHAT_ID, chatID);
         startActivity(chatActivity);
 
     }

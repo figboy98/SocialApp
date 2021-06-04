@@ -88,6 +88,12 @@ public class BluetoothService extends Service {
     private int code_size;
     private final Charset charset = StandardCharsets.UTF_16;
 
+    public class LocalBinder extends Binder {
+        public BluetoothService getService() {
+            return BluetoothService.this;
+        }
+    }
+
     @Override
     public void onCreate() {
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -101,11 +107,7 @@ public class BluetoothService extends Service {
         code_size = Constants.BLUETOOTH_TYPE_CHAT_MESSAGE.length;
     }
 
-    public class LocalBinder extends Binder {
-        public BluetoothService getService() {
-            return BluetoothService.this;
-        }
-    }
+
 
     @Nullable
     @Override

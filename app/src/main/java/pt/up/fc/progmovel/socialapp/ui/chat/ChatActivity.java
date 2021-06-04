@@ -20,7 +20,6 @@ import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class ChatActivity extends FragmentActivity {
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
     private String mChatID;
     private HomeViewModel homeViewModel;
     private BluetoothService mBluetoothService;
@@ -31,10 +30,10 @@ public class ChatActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         Intent intent = getIntent();
-        mChatID = intent.getStringExtra(EXTRA_CHAT_ID);
+        mChatID = intent.getStringExtra(Constants.EXTRA_CHAT_ID);
 
         Bundle bundle = new Bundle();
-        bundle.putString(EXTRA_CHAT_ID, mChatID);
+        bundle.putString(Constants.EXTRA_CHAT_ID, mChatID);
 
 //        ServiceConnection connection = new ServiceConnection() {
 //

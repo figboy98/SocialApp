@@ -46,24 +46,44 @@ public class ChatInputFragment extends Fragment {
     private final int GET_IMAGE_CODE = 1;
 
     private Boolean mBound;
-    private Constants mConstants;
     private String localUserId;
+    private ServiceConnection connection;
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
+
         if (getArguments() != null) {
             mChatID = getArguments().getString(Constants.EXTRA_CHAT_ID);
         }
-        //Activity activity = MainActivity.class.getA
 
         SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
+
+
+        connection = new ServiceConnection() {
+
+            @Override
+            public void onServiceConnected(ComponentName className,
+                                           IBinder service) {
+                BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
+                mBluetoothService = binder.getService();
+                mBound = true;
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName arg0) {
+                mBound = false;
+            }
+        };
+
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+
     }
 
     @Override
@@ -82,23 +102,6 @@ public class ChatInputFragment extends Fragment {
 
         return view;
     }
-
-    private ServiceConnection connection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
-            mBluetoothService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
 
     private class SentButtonClickListener implements View.OnClickListener {
 

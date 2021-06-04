@@ -57,21 +57,19 @@ public class  ChatMessageListFragment extends Fragment {
     private static  final int VIDEO_RECEIVED =5;
     private String mLocalUserId;
     private View view;
-    private Constants mConstants;
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);
-        mConstants = new Constants();
 
         String chatID = null;
         if (getArguments() != null) {
-            chatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
+            chatID = getArguments().getString(Constants.EXTRA_CHAT_ID);
         }
 
-        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+        SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        mLocalUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
+        mLocalUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
         ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(requireActivity().getApplication(), chatID);
         mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
