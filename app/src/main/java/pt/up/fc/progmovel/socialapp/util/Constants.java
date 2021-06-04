@@ -14,9 +14,10 @@ public class Constants {
     public static final String TYPE_GROUP_CHAT_ID = "GroupId";
     public static final String TYPE_POST_MESSAGE = "PostMessage";
 
-    public static final
+    public static final String SHARED_PREFERENCES= "pt.up.fc.progmovel.socialapp.SHARED";
+    public static final String SHARED_LOCAL_USER_ID= "pt.up.fc.progmovel.socialapp.shared.LOCAL_USER_ID";
 
-
+    public static  final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.EXTRA_CHAT_ID";
     public Constants(){
 
     }

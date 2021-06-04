@@ -31,7 +31,6 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-        mConstants = new Constants();
         mSocialAppRepository = new SocialAppRepository(this.getApplication());
         nameInput = findViewById(R.id.login_name_input);
         Button loginButton = findViewById(R.id.login_button);
@@ -49,9 +48,9 @@ public class Login extends AppCompatActivity {
                     mUser = mSocialAppRepository.getUser(name);
                     if (mUser != null) {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+                        SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString(mConstants.SHARED_LOCAL_USER_ID, mUser.getUserID()).apply();
+                        editor.putString(Constants.SHARED_LOCAL_USER_ID, mUser.getUserID()).apply();
                         startActivity(intent);
                         finish();
                     } else {

@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        loginActivity.launch(login);
-
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

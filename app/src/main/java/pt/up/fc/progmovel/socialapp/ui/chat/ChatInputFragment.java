@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,12 +59,11 @@ public class ChatInputFragment extends Fragment {
         }
         //Activity activity = MainActivity.class.getA
 
-        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
+        SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        mConstants = new Constants();
     }
 
     @Override
@@ -150,7 +151,7 @@ public class ChatInputFragment extends Fragment {
 
                                     message.setByte(data);
 
-                                    mBluetoothService.write(message.getByte(), mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                                    mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
 
                                     /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
                                     then its saved to the storage */
