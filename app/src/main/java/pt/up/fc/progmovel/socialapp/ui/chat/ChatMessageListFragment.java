@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.socialapp.R;
-import com.squareup.picasso.Picasso;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,6 +43,7 @@ import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class  ChatMessageListFragment extends Fragment {
     private RecyclerView mMessagesRecyclerView;
@@ -55,23 +55,23 @@ public class  ChatMessageListFragment extends Fragment {
     private static final int IMAGE_SENT =3;
     private static final int VIDEO_SENT = 4;
     private static  final int VIDEO_RECEIVED =5;
-    private static final String EXTRA_CHAT_ID =  "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
     private String mLocalUserId;
     private View view;
+    private Constants mConstants;
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
         super.onCreate(savedInstanceSate);
+        mConstants = new Constants();
 
         String chatID = null;
         if (getArguments() != null) {
-            chatID = getArguments().getString(EXTRA_CHAT_ID);
+            chatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
 
-        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        mLocalUserId = preferences.getString(LOCAL_USER_UUID, "");
+        mLocalUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         ChatMessageListViewModelFactory chatMessageListViewModelFactory = new ChatMessageListViewModelFactory(requireActivity().getApplication(), chatID);
         mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
@@ -113,9 +113,8 @@ public class  ChatMessageListFragment extends Fragment {
 
     }
 
-    private class MessageTextReceived extends RecyclerView.ViewHolder {
-        private ChatMessage mChatMessage;
-        private TextView mMessage;
+    private static class MessageTextReceived extends RecyclerView.ViewHolder {
+        private final TextView mMessage;
 
         public MessageTextReceived(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.chat_text_received, parent, false));
@@ -124,16 +123,14 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message) {
-            mChatMessage = message;
             mMessage.setText(message.getTextMessage().toString());
 
 
         }
     }
 
-    private class MessageTextSent extends RecyclerView.ViewHolder{
-        private  ChatMessage mChatMessage;
-        private  TextView mMessage;
+    private static class MessageTextSent extends RecyclerView.ViewHolder{
+        private final TextView mMessage;
 
         public MessageTextSent(LayoutInflater inflater, ViewGroup parent){
             super(inflater.inflate(R.layout.chat_text_sent,parent,false));
@@ -142,7 +139,6 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message){
-            mChatMessage = message;
             mMessage.setText(message.getTextMessage().toString());
         }
     }
@@ -158,7 +154,9 @@ public class  ChatMessageListFragment extends Fragment {
         public void bind(ChatMessage message){
 
             Uri imageUri = Uri.parse(message.getTextMessage());
-            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
+            //Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
+            Glide.with(view).asBitmap().fitCenter().load(imageUri).into(mImage);
+
 
         }
     }
@@ -173,7 +171,8 @@ public class  ChatMessageListFragment extends Fragment {
 
         public void bind(ChatMessage message){
             Uri imageUri = Uri.parse(message.getTextMessage());
-            Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
+            //Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
+            Glide.with(view).asBitmap().fitCenter().load(imageUri).into(mImage);
 
         }
     }
@@ -264,9 +263,9 @@ public class  ChatMessageListFragment extends Fragment {
 
             switch (viewType){
                 case TEXT_RECEIVED:
-                    return new MessageTextReceived(layoutInflater,parent);
+                    return new MessageTextReceived(layoutInflater, parent);
                 case TEXT_SENT:
-                    return new MessageTextSent(layoutInflater,parent);
+                    return new MessageTextSent(layoutInflater, parent);
                 case IMAGE_RECEIVED:
                     return  new MessageImageReceived(layoutInflater,parent);
                 case IMAGE_SENT:
@@ -276,7 +275,7 @@ public class  ChatMessageListFragment extends Fragment {
                 case VIDEO_SENT:
                     return new MessageVideoSent(layoutInflater,parent);
             }
-            return new MessageTextSent(layoutInflater,parent);
+            return new MessageTextSent(layoutInflater, parent);
         }
 
 
@@ -316,9 +315,4 @@ public class  ChatMessageListFragment extends Fragment {
             return mChatMessageList.size();
         }
     }
-
-
-
-
-
 }

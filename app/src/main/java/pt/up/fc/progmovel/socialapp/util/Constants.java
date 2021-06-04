@@ -15,6 +15,8 @@ public class Constants {
     public static final String TYPE_POST_MESSAGE = "PostMessage";
 
 
-    private Constants(){}
+    public Constants(){
+
+    }
 
 }

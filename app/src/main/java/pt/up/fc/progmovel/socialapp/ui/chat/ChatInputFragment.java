@@ -1,5 +1,6 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +22,12 @@ import androidx.fragment.app.Fragment;
 
 import com.example.socialapp.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
@@ -42,20 +46,25 @@ public class ChatInputFragment extends Fragment {
     private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
     private Boolean mBound;
+    private Constants mConstants;
     private String localUserId;
+
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
-        if(getArguments()!=null){
-            mChatID = getArguments().getString(EXTRA_CHAT_ID);
+        if (getArguments() != null) {
+            mChatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
         SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
 
-        localUserId = preferences.getString(LOCAL_USER_UUID, "");
+        SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+        localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         Intent intent = new Intent(requireContext(), BluetoothService.class);
         requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        mConstants = new Constants();
     }
 
     @Override
@@ -112,7 +121,7 @@ public class ChatInputFragment extends Fragment {
     }
 
     private class ImagesButtonClickListener implements View.OnClickListener {
-        private String mType;
+        private final String mType;
 
         public ImagesButtonClickListener(String type) {
             mType = type;
@@ -135,6 +144,26 @@ public class ChatInputFragment extends Fragment {
                                 String imagePath = result.get(i).toString();
                                 ChatMessage message = new ChatMessage(imagePath, date, localUserId, mChatID, messageType);
                                 mSocialAppRepository.insertChatMessage(message);
+                                try {
+                                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), result.get(i));
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                                    byte[] data = baos.toByteArray();
+
+                                    /*Save media bytes to the message to make it easier to send with Bluetooth */
+
+                                    message.setByte(data);
+
+                                    mBluetoothService.write(message.getByte(), mConstants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+
+                                    /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
+                                    then its saved to the storage */
+
+                                    message.setByte(new byte[0]);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
 

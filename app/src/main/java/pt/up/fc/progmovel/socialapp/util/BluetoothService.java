@@ -1,5 +1,6 @@
 package pt.up.fc.progmovel.socialapp.util;
 
+import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,17 +16,29 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.ParcelUuid;
+import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -33,6 +46,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInput;
@@ -40,9 +56,11 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
@@ -330,60 +348,7 @@ public class BluetoothService extends Service {
         mConnectThread.start();
     }
 
-    public Object byteToObject(byte[] bytes){
-        Object object =null;
-        ObjectInput obIn=null;
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        try {
-            obIn = new ObjectInputStream(inputStream);
-        } catch (IOException e) {
-            Log.d(TAG, "Data Received: Creating object failed: " + e);
-        }
 
-        try {
-            try {
-                if(obIn !=null){
-                    object =  obIn.readObject();
-                }
-                else{
-                    Log.d(TAG, "Unable to open data stream");
-                }
-            } catch (IOException e) {
-                Log.d(TAG, "Data Received: Reading object failed: " + e);
-
-            }
-        } catch (ClassNotFoundException e) {
-            Log.d(TAG, "Data Received: Object class not found: " + e);
-
-        }
-        return object;
-
-    }
-    public void dataReceived(byte[] bytes){
-        Log.d(TAG, "Data Received Function");
-
-        Object object= byteToObject(bytes);
-
-        String type = null;
-
-        if (object != null) {
-            type = object.getClass().toString();
-        }
-        else{
-            return;
-        }
-
-        if(type.equals("class pt.up.fc.progmovel.socialapp.database.ChatMessage")){
-            Log.d(TAG, "ChatMessage Received");
-            ChatMessage message = (ChatMessage) object;
-            mRepository.insertChatMessage(message);
-
-        }
-        else if(type.equals("String")){
-            Log.d(TAG, "String Received");
-        }
-
-    }
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mSocket;
@@ -530,6 +495,129 @@ public class BluetoothService extends Service {
 
     public void write(byte[] bytes, byte[] typeOfMessage) {
         mConnectedThread.write(bytes, typeOfMessage);
+    }
+
+    public void verifyWriteReadPermissions() {
+        int write = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int read = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (write != PackageManager.PERMISSION_GRANTED || read != PackageManager.PERMISSION_GRANTED) {
+
+
+        }
+    }
+
+    public Uri writeToStorage( byte[] data, String type){
+       verifyWriteReadPermissions();
+       Uri uri = null;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "name");
+        OutputStream outputStream = null;
+        String name = UUID.randomUUID().toString().substring(0,5);
+        if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q){
+            ContentResolver resolver = getContentResolver();
+            ContentValues values = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name );
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+            uri= resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
+
+            try {
+                outputStream = resolver.openOutputStream(Objects.requireNonNull(uri));
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "Writing File Failed: " + e);
+            }
+
+        }
+        else{
+            String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+            File image = new File(imagesDir, name +".png");
+            uri = Uri.fromFile(image);
+            try {
+                outputStream = new FileOutputStream(image);
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "Writing File Failed: " + e);
+            }
+        }
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return uri;
+    }
+
+    public void chatMessageReceived(ChatMessage message){
+        String type = message.getType();
+
+        if(type.equals("image")){
+            Log.d(TAG, "Image Received");
+            Uri uri = writeToStorage(message.getDataBytes(), "image");
+            message.setTextMessage(uri.toString());
+
+        }
+        else if(type.equals("video")){
+            Log.d(TAG, "Video Received");
+        }
+        else if(type.equals("text")){
+            //mRepository.insertChatMessage(message);
+        }
+        mRepository.insertChatMessage(message);
+    }
+
+    public Object byteToObject(byte[] bytes){
+        Object object =null;
+        ObjectInput obIn=null;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+        try {
+            obIn = new ObjectInputStream(inputStream);
+        } catch (IOException e) {
+            Log.d(TAG, "Data Received: Creating object failed: " + e);
+        }
+
+        try {
+            try {
+                if(obIn !=null){
+                    object =  obIn.readObject();
+                }
+                else{
+                    Log.d(TAG, "Unable to open data stream");
+                }
+            } catch (IOException e) {
+                Log.d(TAG, "Data Received: Reading object failed: " + e);
+
+            }
+        } catch (ClassNotFoundException e) {
+            Log.d(TAG, "Data Received: Object class not found: " + e);
+
+        }
+        return object;
+
+    }
+    public void dataReceived(byte[] bytes){
+        Log.d(TAG, "Data Received Function");
+
+        Object object= byteToObject(bytes);
+
+        String type = null;
+
+        if (object != null) {
+            type = object.getClass().toString();
+        }
+        else{
+            return;
+        }
+
+        if(type.equals("class pt.up.fc.progmovel.socialapp.database.ChatMessage")){
+            Log.d(TAG, "ChatMessage Received");
+            chatMessageReceived((ChatMessage) object);
+
+        }
+        else if(type.equals("String")){
+            Log.d(TAG, "String Received");
+        }
     }
 
 }

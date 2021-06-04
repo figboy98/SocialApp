@@ -23,13 +23,14 @@ import androidx.navigation.ui.NavigationUI;
 import pt.up.fc.progmovel.socialapp.ui.Login;
 import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;
     private static final int LOCATION_PERMISSION = 2;
-    private String mUserID;
+    private String mLocalUserId;
     private BluetoothService mBluetoothService;
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
+    private Constants mConstants;
 
 
     BluetoothAdapter bt;
@@ -54,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        loginActivity.launch(login);
-
+        mLocalUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
