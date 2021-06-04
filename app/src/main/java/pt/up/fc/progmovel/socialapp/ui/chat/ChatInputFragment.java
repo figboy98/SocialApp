@@ -42,8 +42,6 @@ public class ChatInputFragment extends Fragment {
     private String mChatID;
     private EditText mInputMessage;
     private final int GET_IMAGE_CODE = 1;
-    private static final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.CHAT_ID";
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
     private Boolean mBound;
     private Constants mConstants;
@@ -52,12 +50,13 @@ public class ChatInputFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConstants = new Constants();
         ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
         if (getArguments() != null) {
             mChatID = getArguments().getString(mConstants.EXTRA_CHAT_ID);
         }
-        SharedPreferences preferences = requireActivity().getPreferences(Context.MODE_PRIVATE);
+        //Activity activity = MainActivity.class.getA
 
         SharedPreferences preferences = requireActivity().getSharedPreferences(mConstants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
         localUserId = preferences.getString(mConstants.SHARED_LOCAL_USER_ID, "");
@@ -109,8 +108,6 @@ public class ChatInputFragment extends Fragment {
                 Date date = new Date();
                 ChatMessage message = new ChatMessage(mInputMessage.getText().toString(), date, localUserId, mChatID, "text");
                 mSocialAppRepository.insertChatMessage(message);
-                byte[] teste = new byte[10000];
-                message.setByte(teste);
                 byte[] messageByte = message.getByte();
                 mBluetoothService.write(messageByte,Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
             }
