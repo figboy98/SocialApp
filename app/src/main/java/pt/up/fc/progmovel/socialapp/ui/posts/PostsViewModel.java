@@ -21,4 +21,5 @@ public class PostsViewModel extends ViewModel {
     public MutableLiveData<Stack<Post>> getPost() {
         return postList;
     }
+
 }

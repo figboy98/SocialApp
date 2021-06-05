@@ -36,25 +36,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Intent login = new Intent(this, Login.class);
-
-        ActivityResultLauncher<Intent> loginActivity = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if(data!=null){
-                            mUserID = data.getStringExtra(Constants.SHARED_LOCAL_USER_ID);
-                            SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = preferences.edit();
-                            editor.putString(Constants.SHARED_LOCAL_USER_ID, mUserID).commit();
-                        }
-                    }
-                });
-
-        loginActivity.launch(login);
-
-
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
