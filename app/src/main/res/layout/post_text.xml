@@ -8,14 +8,32 @@
 
     <TextView
         android:id="@+id/post_content"
-        android:layout_width="380dp"
-        android:layout_height="71dp"
-        android:background="#DF333333"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#DF717171"
         android:outlineProvider="paddedBounds"
         android:singleLine="false"
         android:textAlignment="center"
         android:textColor="#E6E6E6"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="661dp" />
+
+    <Space
+        android:layout_width="10dp"
+        android:layout_height="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="16dp" />
+        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

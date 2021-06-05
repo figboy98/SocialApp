@@ -9,6 +9,8 @@ import androidx.room.Transaction;
 
 import java.util.List;
 
+import pt.up.fc.progmovel.socialapp.ui.posts.Post;
+
 @Dao
 public interface DatabaseDao {
 
@@ -26,6 +28,9 @@ public interface DatabaseDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertUser(User user);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertPost(Post post);
+
     @Transaction
     @Query("SELECT * FROM GroupChat WHERE groupChatID = :groupChatID")
      LiveData<GroupChatWithMessages> getGroupChatWithMessages(String groupChatID);
@@ -41,12 +46,11 @@ public interface DatabaseDao {
     @Query("SELECT * FROM USER")
     List<User> getUsers();
 
+    @Query("SELECT * FROM POST")
+    LiveData<List<Post>> getPosts();
 
     @Query("SELECT * FROM USER WHERE name=:name")
     abstract User getUser(String name);
-
-
-
 
 
 

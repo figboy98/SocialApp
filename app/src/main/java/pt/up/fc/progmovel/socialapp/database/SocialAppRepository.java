@@ -46,7 +46,7 @@ public class SocialAppRepository {
         new InsertGroupChatAsyncTask(databaseDao).execute(groupChat);
 
         for(User user: users){
-            GroupChatUsersCrossRef ref = new GroupChatUsersCrossRef(user.getUserID(), groupChat.getGroupChatID());
+            GroupChatUsersCrossRef ref = new GroupChatUsersCrossRef(user.getUserId(), groupChat.getGroupChatID());
             new InsertGroupChatUsersCrossRefAsyncTask(databaseDao).execute(ref);
         }
     }

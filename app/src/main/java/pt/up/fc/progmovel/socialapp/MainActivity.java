@@ -30,21 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int LOCATION_PERMISSION = 2;
     private String mUserID;
     private BluetoothService mBluetoothService;
-    private Constants mConstants;
-
-
     BluetoothAdapter bt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mConstants = new Constants();
-        Intent login = new Intent(this, Login.class);
-
-        SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
-
-
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -65,8 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent communication = new Intent(this, BluetoothService.class);
         this.startService(communication);
-
-
 
 
     }

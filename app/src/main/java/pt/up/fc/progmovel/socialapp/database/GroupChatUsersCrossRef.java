@@ -6,17 +6,17 @@ import androidx.room.PrimaryKey;
 
 import java.util.UUID;
 
-@Entity(primaryKeys = {"userID", "groupChatID"})
+@Entity(primaryKeys = {"userId", "groupChatID"})
 public class GroupChatUsersCrossRef {
     @NonNull
-    private String userID;
+    private String userId;
     @NonNull
     private String groupChatID;
 
     public GroupChatUsersCrossRef(){}
 
     public GroupChatUsersCrossRef(String user, String group){
-        userID = user;
+        userId = user;
         groupChatID = group;
     }
 
@@ -24,15 +24,15 @@ public class GroupChatUsersCrossRef {
         return groupChatID;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
     }
 
     public void setGroupChatID(String groupID) {
         this.groupChatID = groupID;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

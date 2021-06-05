@@ -9,7 +9,7 @@ import java.util.List;
 public class UsersWithGroupChats {
     @Embedded User user;
     @Relation(
-            parentColumn = "userID",
+            parentColumn = "userId",
             entityColumn = "groupChatID",
             associateBy = @Junction(GroupChatUsersCrossRef.class)
     )

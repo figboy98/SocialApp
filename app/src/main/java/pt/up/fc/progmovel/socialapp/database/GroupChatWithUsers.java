@@ -11,7 +11,7 @@ public class GroupChatWithUsers {
     GroupChat group;
     @Relation(
             parentColumn = "groupChatID",
-            entityColumn = "userID",
+            entityColumn = "userId",
             associateBy = @Junction(GroupChatUsersCrossRef.class)
     )
     public List<User> users;
