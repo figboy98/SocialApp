@@ -14,15 +14,10 @@ public class ChatMessageListViewModel extends AndroidViewModel {
     private final LiveData<GroupChatWithMessages> mGroupChatWithMessages;
 
 
-    private SocialAppRepository mSocialAppRepository;
-    private String mChatID;
-
-
     public ChatMessageListViewModel(@NonNull Application application, String chatID) {
         super(application);
-        mChatID = chatID;
-        mSocialAppRepository = new SocialAppRepository(application);
-        mGroupChatWithMessages = mSocialAppRepository.getMessagesOfGroupChat(mChatID);
+        SocialAppRepository mSocialAppRepository = new SocialAppRepository(application);
+        mGroupChatWithMessages = mSocialAppRepository.getMessagesOfGroupChat(chatID);
     }
 
     public LiveData<GroupChatWithMessages> getMessages() {

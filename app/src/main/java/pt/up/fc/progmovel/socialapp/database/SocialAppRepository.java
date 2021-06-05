@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class SocialAppRepository {
-    private DatabaseDao databaseDao;
+    private final DatabaseDao databaseDao;
 
     public SocialAppRepository(Application application) {
         SocialAppDatabase database = SocialAppDatabase.getDatabase(application);
@@ -60,9 +60,8 @@ public class SocialAppRepository {
     }
 
     public LiveData<GroupChatWithMessages> getMessagesOfGroupChat(String ID) {
-        LiveData<GroupChatWithMessages> chatMessages = databaseDao.getGroupChatWithMessages(ID);
+        return databaseDao.getGroupChatWithMessages(ID);
 
-        return chatMessages;
     }
 
     public LiveData<List<ChatMessage>> getChatMessages(){
@@ -76,7 +75,7 @@ public class SocialAppRepository {
     }
 
     private static class InsertChatMessageAsyncTask extends AsyncTask<ChatMessage, Void, Void> {
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
 
         private InsertChatMessageAsyncTask(DatabaseDao dao) {
             databaseDao = dao;
@@ -90,7 +89,7 @@ public class SocialAppRepository {
     }
 
     private static class InsertGroupChatAsyncTask extends AsyncTask<GroupChat, Void, Void> {
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
 
 
         public InsertGroupChatAsyncTask(DatabaseDao dao) {
@@ -105,7 +104,7 @@ public class SocialAppRepository {
     }
 
     private static class InsertGroupChatUsersCrossRefAsyncTask extends AsyncTask<GroupChatUsersCrossRef, Void, Void> {
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
 
 
         public InsertGroupChatUsersCrossRefAsyncTask(DatabaseDao dao) {
@@ -120,7 +119,7 @@ public class SocialAppRepository {
     }
 
     private static class InsertGroupChatMessagesCrossRefAsyncTask extends AsyncTask<GroupChatMessagesCrossRef, Void, Void> {
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
 
         public InsertGroupChatMessagesCrossRefAsyncTask(DatabaseDao dao) {
             databaseDao = dao;
@@ -134,7 +133,7 @@ public class SocialAppRepository {
         }
     }
     private static class GetUsersAsyncTask extends AsyncTask<Void,Void,List<User>>{
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
         public GetUsersAsyncTask(DatabaseDao dao){
             databaseDao = dao;
         }
@@ -146,7 +145,7 @@ public class SocialAppRepository {
     }
 
     private static class GetUserAsyncTask extends AsyncTask<String,Void,User>{
-        private DatabaseDao databaseDao;
+        private final DatabaseDao databaseDao;
         public GetUserAsyncTask(DatabaseDao dao){
             databaseDao = dao;
         }

@@ -2,37 +2,37 @@ package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
-import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 @Entity(primaryKeys = {"userId", "groupChatID"})
 public class GroupChatUsersCrossRef {
     @NonNull
-    private String userId;
+    private final String userId;
     @NonNull
-    private String groupChatID;
+    private final String groupChatID;
 
-    public GroupChatUsersCrossRef(){}
 
-    public GroupChatUsersCrossRef(String user, String group){
+    public GroupChatUsersCrossRef(@NotNull String user, @NotNull String group){
         userId = user;
         groupChatID = group;
     }
 
+    @NotNull
     public String getGroupChatID() {
         return groupChatID;
     }
 
+    @NotNull
     public String getUserId() {
         return userId;
     }
 
-    public void setGroupChatID(String groupID) {
+  /*  public void setGroupChatID(@NotNull String groupID) {
         this.groupChatID = groupID;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(@NotNull String userId) {
         this.userId = userId;
-    }
+    }*/
 }

@@ -1,34 +1,30 @@
 package pt.up.fc.progmovel.socialapp.database;
 
-import android.bluetooth.BluetoothAdapter;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class User {
     @NonNull
-    @PrimaryKey(autoGenerate = false)
-    private String userId;
+    @PrimaryKey()
+    private final String userId;
     private String name;
 
-    public User(String name, String userId) {
+    public User(String name, @NotNull String userId) {
         this.userId = userId;
         this.name = name;
     }
 
+    @NotNull
     public String getUserId(){
         return userId;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setUserID(String userID) {
-        this.userId = userId;
     }
 
     public void setName(String name) {

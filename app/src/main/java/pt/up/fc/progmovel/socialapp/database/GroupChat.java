@@ -1,32 +1,32 @@
 package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 public class GroupChat {
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey()
     @NonNull
     private String groupChatID;
     private String groupName;
 
-    public GroupChat(){}
-    public GroupChat(String name, String groupChatID){
+
+    public GroupChat(String name, @NotNull String groupChatID){
         this.groupChatID = groupChatID;
         groupName = name;
     }
 
+    @NotNull
     public String getGroupChatID(){
         return groupChatID;
     }
 
     public String getGroupName(){return groupName;}
 
-    public void setGroupChatID(String groupChatID) {
+    public void setGroupChatID(@NotNull String groupChatID) {
         this.groupChatID = groupChatID;
     }
     public void setGroupName(String name){

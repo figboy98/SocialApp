@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import org.jetbrains.annotations.NotNull;
 
 public class ChatGroupsViewModelFactory implements ViewModelProvider.Factory {
-    private Application mApplication;
-    private  String mUserId;
+    private final Application mApplication;
+    private final String mUserId;
 
     public ChatGroupsViewModelFactory(Application application, String userID){
         mApplication = application;

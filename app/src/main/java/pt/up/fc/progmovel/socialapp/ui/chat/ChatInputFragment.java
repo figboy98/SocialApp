@@ -27,20 +27,15 @@ import androidx.fragment.app.Fragment;
 import com.example.socialapp.R;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 import pt.up.fc.progmovel.socialapp.util.Constants;
-
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
 
 
 public class ChatInputFragment extends Fragment {
@@ -49,17 +44,11 @@ public class ChatInputFragment extends Fragment {
     private static SocialAppRepository mSocialAppRepository;
     private String mChatID;
     private EditText mInputMessage;
-    private final int GET_IMAGE_CODE = 1;
-
-    private Boolean mBound;
     private String localUserId;
-    private ServiceConnection connection;
-    private  View view;
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ChatMessage chatMessage = new ChatMessage();
         mSocialAppRepository = new SocialAppRepository(requireActivity().getApplication());
 
         if (getArguments() != null) {
@@ -70,19 +59,17 @@ public class ChatInputFragment extends Fragment {
         localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
 
-        connection = new ServiceConnection() {
+        ServiceConnection connection = new ServiceConnection() {
 
             @Override
             public void onServiceConnected(ComponentName className,
                                            IBinder service) {
                 BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
                 mBluetoothService = binder.getService();
-                mBound = true;
             }
 
             @Override
             public void onServiceDisconnected(ComponentName arg0) {
-                mBound = false;
             }
         };
 
@@ -94,7 +81,7 @@ public class ChatInputFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_chat_input, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat_input, container, false);
 
         mInputMessage = view.findViewById(R.id.chat_message_input);
         ImageButton sendButton = view.findViewById(R.id.send_image_button);
@@ -169,54 +156,54 @@ public class ChatInputFragment extends Fragment {
         @Override
         protected Void doInBackground(Activity... activities) {
             boolean sent=false;
-            if (type.equals("text")) {
-                byte[] messageByte = message.getByte();
-                sent = mBluetoothService.write(messageByte, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+            switch (type) {
+                case "text":
+                    byte[] messageByte = message.getByte();
+                    sent = mBluetoothService.write(messageByte, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
 
-            }
-            else if(type.equals("image")){
-                mSocialAppRepository.insertChatMessage(message);
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activities[0].getContentResolver(), Uri.parse(message.getTextMessage()));
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-                    byte[] data = baos.toByteArray();
+                    break;
+                case "image":
+                    mSocialAppRepository.insertChatMessage(message);
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(activities[0].getContentResolver(), Uri.parse(message.getTextMessage()));
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                        byte[] data = baos.toByteArray();
 
-                    /*Save media bytes to the message to make it easier to send with Bluetooth */
+                        /*Save media bytes to the message to make it easier to send with Bluetooth */
 
-                    message.setByte(data);
+                        message.setByte(data);
 
-                    sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                        sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
 
                     /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
                     then its saved to the storage */
 
-                    message.setByte(new byte[0]);
+                        message.setByte(new byte[0]);
 
-                } catch (IOException e) {
-                    Log.d(TAG, "Error transforming image in bytes: " +e);
+                    } catch (IOException e) {
+                        Log.d(TAG, "Error transforming image in bytes: " + e);
 
-                }
+                    }
 
-            }
-            else if(type.equals("video")){
-                Bitmap bitmap = null;
-                try {
-                   ByteArrayOutputStream baos  = new ByteArrayOutputStream();
-                   String path = Uri.parse(message.getTextMessage()).getPath();
-                   InputStream inputStream = activities[0].getContentResolver().openInputStream(Uri.parse(message.getTextMessage()));
-                   byte[] buffer = new byte[1024];
-                   int n;
-                   while (-1 != (n = inputStream.read(buffer)))
-                        baos.write(buffer, 0, n);
+                    break;
+                case "video":
+                    try {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        InputStream inputStream = activities[0].getContentResolver().openInputStream(Uri.parse(message.getTextMessage()));
+                        byte[] buffer = new byte[1024];
+                        int n;
+                        while (-1 != (n = inputStream.read(buffer)))
+                            baos.write(buffer, 0, n);
 
-                    byte[] data = baos.toByteArray();
-                    message.setByte(data);
-                    sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
-                    message.setByte(new byte[0]);
-                } catch (IOException e) {
-                    Log.d(TAG, "Error transforming video in bytes: " +e);
-                }
+                        byte[] data = baos.toByteArray();
+                        message.setByte(data);
+                        sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                        message.setByte(new byte[0]);
+                    } catch (IOException e) {
+                        Log.d(TAG, "Error transforming video in bytes: " + e);
+                    }
+                    break;
             }
             if (sent) {
                 mSocialAppRepository.insertChatMessage(message);

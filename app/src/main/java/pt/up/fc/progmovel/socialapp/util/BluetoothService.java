@@ -1,6 +1,5 @@
 package pt.up.fc.progmovel.socialapp.util;
 
-import android.Manifest;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -20,35 +19,22 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.ParcelUuid;
 import android.provider.MediaStore;
-import android.text.format.Time;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,14 +43,10 @@ import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.spec.EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
 import java.util.UUID;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
@@ -75,15 +57,10 @@ public class BluetoothService extends Service {
     private static final String TAG_SCAN_ADVERT = "BLUETOOTH_SCAN_ADVERT";
     private static final UUID SERVICE_UUID = UUID.fromString("e526a16e-f365-472a-87e3-a219d75ff262");
     private static final ParcelUuid mParcelUuid = new ParcelUuid(SERVICE_UUID);
-    private static final BluetoothAdapter bt = null;
     private static final ArrayList<BluetoothDevice> mBTDevices = new ArrayList<>();
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothLeScanner;
     private BluetoothLeAdvertiser mBluetoothLeAdvertiser;
-    private BluetoothServerSocket mServerSocket;
-    private BluetoothDevice mBluetoothDevice;
-    private AcceptThread mAcceptThread;
-    private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private LeAdvertiseCallBack mLeAdvertiseCallBack;
     private LeScanCallback mLeScanCallback;
@@ -123,10 +100,9 @@ public class BluetoothService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(mBluetoothAdapter.isEnabled()) {
             Log.d(TAG, "Bluetooth Service is running...");
-            final String CHANNEL_ID = "SocialAppNotification";
             startAdvertising();
             scanLeDevice(true);
-            mAcceptThread = new AcceptThread();
+            AcceptThread mAcceptThread = new AcceptThread();
             mAcceptThread.start();
         }
 
@@ -282,7 +258,7 @@ public class BluetoothService extends Service {
         }
 
         public void run() {
-            BluetoothSocket socket = null;
+            BluetoothSocket socket;
             while (true) {
                 try {
                     socket = mServerSocket.accept();
@@ -354,7 +330,7 @@ public class BluetoothService extends Service {
     }
 
     public void startClient(BluetoothDevice device) {
-        mConnectThread = new ConnectThread(device);
+        ConnectThread mConnectThread = new ConnectThread(device);
         mConnectThread.start();
     }
 
@@ -388,11 +364,9 @@ public class BluetoothService extends Service {
 
         public void run() {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int message_type = 0;
-
             byte[] data = new byte[1024]; // 10 Megabits buffer
             int current = 0;
-            int bytes = 0;
+            int bytes;
             byte[] tmp;
             byte[] code;
             byte[] messageArray;
@@ -438,7 +412,7 @@ public class BluetoothService extends Service {
                 byte[] buffer = new byte[1024]; //10 Megabits buffer
                 long startTime = System.nanoTime();
 
-                int bytesSent=0;
+                int bytesSent;
                 int counter=0;
 
                 Log.d(TAG, "Bytes to send: " + bytes.length);
@@ -496,7 +470,7 @@ public class BluetoothService extends Service {
     }
 
     public Uri writeVideoToStorage(byte[] data) {
-        Uri uri = null;
+        Uri uri;
         if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q){
             final ContentValues contentValues = new ContentValues();
             ContentResolver resolver = getContentResolver();
@@ -539,7 +513,7 @@ public class BluetoothService extends Service {
 
 
     public Uri writeImageToStorage( byte[] data){
-       Uri uri = null;
+       Uri uri;
         Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
         final ContentValues contentValues = new ContentValues();
         String name = UUID.randomUUID().toString().substring(0,5);
@@ -576,7 +550,7 @@ public class BluetoothService extends Service {
         }
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         try {
-            outputStream.close();
+            Objects.requireNonNull(outputStream).close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -586,22 +560,26 @@ public class BluetoothService extends Service {
     public void chatMessageReceived(ChatMessage message){
         String type = message.getType();
 
-        if(type.equals("image")){
-            Log.d(TAG, "Image Received");
-            Uri uri = writeImageToStorage(message.getDataBytes());
-            message.setTextMessage(uri.toString());
-            message.setByte(new byte[0]);
+        switch (type) {
+            case "image": {
+                Log.d(TAG, "Image Received");
+                Uri uri = writeImageToStorage(message.getDataBytes());
+                message.setTextMessage(uri.toString());
+                message.setByte(new byte[0]);
 
-        }
-        else if(type.equals("video")){
-            Log.d(TAG, "Video Received");
-            Uri uri = writeVideoToStorage(message.getDataBytes());
-            message.setByte(new byte[0]);
-            message.setTextMessage(uri.toString());
-        }
-        else if(type.equals("text")){
+                break;
+            }
+            case "video": {
+                Log.d(TAG, "Video Received");
+                Uri uri = writeVideoToStorage(message.getDataBytes());
+                message.setByte(new byte[0]);
+                message.setTextMessage(uri.toString());
+                break;
+            }
+            case "text":
 
-            Log.d(TAG, "Text Received");
+                Log.d(TAG, "Text Received");
+                break;
         }
 
         mRepository.insertChatMessage(message);
@@ -641,7 +619,7 @@ public class BluetoothService extends Service {
 
         Object object= byteToObject(bytes);
 
-        String type = null;
+        String type;
 
         if (object != null) {
             type = object.getClass().toString();

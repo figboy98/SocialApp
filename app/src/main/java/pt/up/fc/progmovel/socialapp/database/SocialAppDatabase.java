@@ -43,7 +43,7 @@ public abstract class SocialAppDatabase extends RoomDatabase {
             }
             return db;
         }
-        private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback(){
+        private static final RoomDatabase.Callback roomCallback = new RoomDatabase.Callback(){
             @Override
             public void onCreate(@NonNull @NotNull SupportSQLiteDatabase database) {
                 super.onCreate(database);
@@ -58,7 +58,7 @@ public abstract class SocialAppDatabase extends RoomDatabase {
         };
 
     private static  class PopulateDbAsyncTask extends AsyncTask<Void,Void,Void> {
-        private DatabaseDao mDatabaseDao;
+        private final DatabaseDao mDatabaseDao;
         private PopulateDbAsyncTask(SocialAppDatabase db){
             mDatabaseDao = db.chatDao();
         }

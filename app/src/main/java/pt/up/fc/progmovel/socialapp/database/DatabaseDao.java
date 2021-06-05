@@ -50,7 +50,7 @@ public interface DatabaseDao {
     LiveData<List<Post>> getPosts();
 
     @Query("SELECT * FROM USER WHERE name=:name")
-    abstract User getUser(String name);
+    User getUser(String name);
 
 
 

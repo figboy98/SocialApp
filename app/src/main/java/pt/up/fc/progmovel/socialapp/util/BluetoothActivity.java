@@ -1,57 +1,28 @@
 package pt.up.fc.progmovel.socialapp.util;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-
 public class BluetoothActivity extends AppCompatActivity {
-    private static final int REQUEST_CONNECT_DEVICE =1;
-    private static final int REQUEST_ENABLE_BT =2;
-    private static final int REQUEST_ENABLE_LOCATION =3;
-    private static final int REQUEST_DISCOVERY = 4;
     private static  final int REQUEST_WRITE = 5;
     private static final int REQUEST_READ = 6;
     private BluetoothAdapter mBluetoothAdapter = null;
-    private BluetoothService mBluetoothServive = null;
-    private LocationManager mLocationManager = null;
     private ActivityResultLauncher<String> requestBluetoothPermission;
-    private ActivityResultLauncher<String> requestBTDiscovery;
     private ActivityResultLauncher<String> requestCoarseLocation;
     private ActivityResultLauncher<String> requestFineLocation;
-    private ActivityResultLauncher<String> requestWritePermission;
-    private ActivityResultLauncher<String> requestReadPermission;
     boolean bluetoothUsePermission = false;
     boolean bluetoothDiscoveryPermission = false;
     boolean coarseLocationPermission = false;
@@ -93,18 +64,6 @@ public class BluetoothActivity extends AppCompatActivity {
                 fineLocationPermission = true;
             }
         });
-
-        requestWritePermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->{
-            if(isGranted){
-                writePermission = true;
-            }
-        });
-        requestReadPermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(),isGranted ->{
-            if(isGranted){
-                readPermission = true;
-            }
-        });
-
     }
     @Override
     public void onStart(){
@@ -113,19 +72,16 @@ public class BluetoothActivity extends AppCompatActivity {
         //Request necessary permissions to be able to use Bluetooth
         checkPermissions();
 
-        mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        LocationManager mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         if (!mBluetoothAdapter.isEnabled()) {
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-        else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+       // else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
 //            Intent intentDiscover = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
 //            intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 //            startActivity(intentDiscover);
-        }
-
-        else if (mBluetoothServive == null) {
-        }
+        //}
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if(!mLocationManager.isLocationEnabled()){
@@ -227,7 +183,7 @@ public class BluetoothActivity extends AppCompatActivity {
             }
             requestBluetoothPermission.launch(Manifest.permission.BLUETOOTH);
         }
-        if(!bluetoothDiscoveryPermission){
+      /*  if(!bluetoothDiscoveryPermission){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if(shouldShowRequestPermissionRationale(Manifest.permission.BLUETOOTH_ADMIN)){
                     //Inform the user of the necessity of this permission
@@ -236,7 +192,7 @@ public class BluetoothActivity extends AppCompatActivity {
             requestBTDiscovery.launch(Manifest.permission.BLUETOOTH_PRIVILEGED);
 
 
-        }
+        }*/
 
         if(!coarseLocationPermission){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -3,7 +3,6 @@ package pt.up.fc.progmovel.socialapp.database;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.OnConflictStrategy;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,7 @@ import java.util.UUID;
 @Entity
 public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
 
-    @PrimaryKey (autoGenerate = false)
+    @PrimaryKey ()
     @NonNull
     private String chatMessageID;
     private String mTextMessage;
@@ -28,10 +27,6 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
     private Long mDate;
     @Ignore
     private byte[] dataBytes;
-
-    public ChatMessage() {
-
-    }
 
     public ChatMessage(String message, Date date, String from, String to, String type) {
         chatMessageID = UUID.randomUUID().toString();
@@ -65,7 +60,7 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
 
     public byte[] getDataBytes(){return dataBytes;}
 
-    public void setChatMessageID(String id){
+    public void setChatMessageID(@NotNull String id){
         chatMessageID = id;
     }
 
@@ -91,7 +86,7 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
         byte[] bytes = null;
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = null;
+        ObjectOutputStream objectOutputStream;
         try{
             objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(this);
