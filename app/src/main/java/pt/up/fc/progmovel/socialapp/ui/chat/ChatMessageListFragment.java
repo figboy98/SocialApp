@@ -1,45 +1,26 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
-import android.app.Application;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContentResolverCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.socialapp.R;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
@@ -57,6 +38,7 @@ public class  ChatMessageListFragment extends Fragment {
     private static  final int VIDEO_RECEIVED =5;
     private String mLocalUserId;
     private View view;
+
 
     @Override
     public void onCreate(Bundle savedInstanceSate) {
@@ -107,8 +89,7 @@ public class  ChatMessageListFragment extends Fragment {
         else{
             mMessageAdapter.setChatMessageList(messagesList);
         }
-        mMessagesRecyclerView.scrollToPosition(messagesList.size()-1);
-
+        mMessagesRecyclerView.scrollToPosition(messagesList.size());
     }
 
     private static class MessageTextReceived extends RecyclerView.ViewHolder {
@@ -121,7 +102,7 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message) {
-            mMessage.setText(message.getTextMessage().toString());
+            mMessage.setText(message.getTextMessage());
 
 
         }
@@ -137,7 +118,7 @@ public class  ChatMessageListFragment extends Fragment {
         }
 
         public void bind(ChatMessage message){
-            mMessage.setText(message.getTextMessage().toString());
+            mMessage.setText(message.getTextMessage());
         }
     }
 
@@ -206,10 +187,8 @@ public class  ChatMessageListFragment extends Fragment {
                     .into(mVideo);
         }
     }
-
-
-    private class MessageAdapter extends  RecyclerView.Adapter{
-        private List<ChatMessage> mChatMessageList = new ArrayList<>();
+    private class MessageAdapter extends  RecyclerView.Adapter<RecyclerView.ViewHolder>{
+        private List<ChatMessage> mChatMessageList;
         public MessageAdapter(List<ChatMessage> messages) {
             mChatMessageList = messages;
         }
@@ -225,29 +204,25 @@ public class  ChatMessageListFragment extends Fragment {
              String type = message.getType();
              String from = message.getFrom();
 
-            if(type.equals("text")){
-                if(from.equals(mLocalUserId)){
-                    return TEXT_SENT;
-                }
-                else{
-                    return  TEXT_RECEIVED;
-                }
-            }
-            else if(type.equals("image")){
-                if(from.equals(mLocalUserId)){
-                    return IMAGE_SENT;
-                }
-                else{
-                    return IMAGE_RECEIVED;
-                }
-            }
-            else if(type.equals("video")){
-                if(from.equals(mLocalUserId)){
-                    return VIDEO_SENT;
-                }
-                else{
-                    return VIDEO_RECEIVED;
-                }
+            switch (type) {
+                case "text":
+                    if (from.equals(mLocalUserId)) {
+                        return TEXT_SENT;
+                    } else {
+                        return TEXT_RECEIVED;
+                    }
+                case "image":
+                    if (from.equals(mLocalUserId)) {
+                        return IMAGE_SENT;
+                    } else {
+                        return IMAGE_RECEIVED;
+                    }
+                case "video":
+                    if (from.equals(mLocalUserId)) {
+                        return VIDEO_SENT;
+                    } else {
+                        return VIDEO_RECEIVED;
+                    }
             }
             return -1;
 

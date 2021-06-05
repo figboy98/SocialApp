@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
@@ -13,17 +18,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.example.socialapp.R;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +34,6 @@ interface OnChatGroupListener{
 }
 
 public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener  {
-    private String localUserId;
     private ChatGroupsViewModel mGroups;
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
@@ -47,11 +44,11 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
         super.onCreate(savedInstanceSate);
         SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
-        localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
+        String localUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
 
         ChatGroupsViewModelFactory chatGroupsViewModelFactory = new ChatGroupsViewModelFactory(requireActivity().getApplication(), localUserId);
         mGroups = new ViewModelProvider(requireActivity(), chatGroupsViewModelFactory).get(ChatGroupsViewModel.class);
-        mChatGroupListener = (OnChatGroupListener) this;
+        mChatGroupListener = this;
     }
 
     @Override
@@ -91,10 +88,9 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     }
 
     private class GroupChatHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private GroupChat mGroupChat;
-        private TextView mChatName;
-        private ImageView mChatImage;
-        private OnChatGroupListener mChatGroupListener;
+        private final TextView mChatName;
+        private final ImageView mChatImage;
+        private final OnChatGroupListener mChatGroupListener;
 
 
         public GroupChatHolder(LayoutInflater inflater, ViewGroup parent, OnChatGroupListener onChatGroupListener) {
@@ -106,8 +102,7 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
         }
 
         public void bind(GroupChat groupChat){
-            mGroupChat = groupChat;
-            mChatName.setText(groupChat.getGroupName().toString());
+            mChatName.setText(groupChat.getGroupName());
             mChatImage.setImageDrawable(ResourcesCompat.getDrawable(requireContext().getResources(),R.drawable.ic_baseline_android_24, null));
 
         }
@@ -119,8 +114,8 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     }
 
     private class GroupChatAdapter extends RecyclerView.Adapter<GroupChatHolder>{
-        private List<GroupChat> mGroupChatList = new ArrayList<>();
-        private OnChatGroupListener mChatGroupListener;
+        private List<GroupChat> mGroupChatList;
+        private final OnChatGroupListener mChatGroupListener;
 
         public GroupChatAdapter(List<GroupChat> groupChatList, OnChatGroupListener onChatGroupListener){
             mGroupChatList = groupChatList;
