@@ -23,15 +23,13 @@ import androidx.navigation.ui.NavigationUI;
 import pt.up.fc.progmovel.socialapp.ui.Login;
 import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;
     private static final int LOCATION_PERMISSION = 2;
     private String mUserID;
     private BluetoothService mBluetoothService;
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
-
-
     BluetoothAdapter bt;
 
     @Override
@@ -46,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if(data!=null){
-                            mUserID = data.getStringExtra(LOCAL_USER_UUID);
+                            mUserID = data.getStringExtra(Constants.SHARED_LOCAL_USER_ID);
                             SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = preferences.edit();
-                            editor.putString(LOCAL_USER_UUID, mUserID).commit();
+                            editor.putString(Constants.SHARED_LOCAL_USER_ID, mUserID).commit();
                         }
                     }
                 });
@@ -77,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent communication = new Intent(this, BluetoothService.class);
         this.startService(communication);
-
-
 
 
     }

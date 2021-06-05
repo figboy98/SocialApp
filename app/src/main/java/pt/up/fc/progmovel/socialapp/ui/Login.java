@@ -1,6 +1,8 @@
 package pt.up.fc.progmovel.socialapp.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,14 +16,14 @@ import com.example.socialapp.R;
 import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.database.User;
+import pt.up.fc.progmovel.socialapp.util.BluetoothService;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class Login extends AppCompatActivity {
     private String name;
     private EditText nameInput;
     private SocialAppRepository mSocialAppRepository;
     private User mUser;
-    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,10 @@ public class Login extends AppCompatActivity {
         nameInput = findViewById(R.id.login_name_input);
         Button loginButton = findViewById(R.id.login_button);
 
+
+        Intent communication = new Intent(this, BluetoothService.class);
+        this.startService(communication);
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,10 +45,15 @@ public class Login extends AppCompatActivity {
 
                     mUser = mSocialAppRepository.getUser(name);
                     if (mUser != null) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         Intent resultIntent = new Intent();
-                        resultIntent.putExtra(LOCAL_USER_UUID, mUser.getUserID());
+                        SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
+                        resultIntent.putExtra(Constants.SHARED_LOCAL_USER_ID, mUser.getUserId());
+                        SharedPreferences.Editor editor = preferences.edit();
                         setResult(MainActivity.RESULT_OK,resultIntent);
-                        finish();
+                        editor.putString(Constants.SHARED_LOCAL_USER_ID, mUser.getUserId()).apply();
+
+                        startActivity(intent);
                     } else {
                         Toast.makeText(Login.this, "Wrong Username", Toast.LENGTH_LONG).show();
                         nameInput.setText("");
