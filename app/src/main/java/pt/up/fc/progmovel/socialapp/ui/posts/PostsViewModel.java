@@ -28,7 +28,6 @@ public class PostsViewModel extends AndroidViewModel {
         postList = mSocialAppRepository.getPosts();
     }
 
-
     public LiveData<List<Post>> getPost() {
         return postList;
     }
