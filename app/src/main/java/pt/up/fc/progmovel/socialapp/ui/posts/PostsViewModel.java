@@ -1,24 +1,35 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 
+import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.database.User;
 
-public class PostsViewModel extends ViewModel {
+public class PostsViewModel extends AndroidViewModel {
 
-    private final MutableLiveData<Stack<Post>> postList = new MutableLiveData<>();
+    private LiveData<List<Post>> postList;
 
-    public PostsViewModel() {
-        Stack<Post> posts = new Stack<>();
-        posts.add(new Post(System.currentTimeMillis(), "7b759450-c4b9-11eb-8529-0242ac130003", "blabla"));
-        postList.setValue(posts);
+    public PostsViewModel(@NonNull @NotNull Application application) {
+        super(application);
+        SocialAppRepository mSocialAppRepository = new SocialAppRepository(application);
+        postList = mSocialAppRepository.getPosts();
     }
 
-    public MutableLiveData<Stack<Post>> getPost() {
+
+    public LiveData<List<Post>> getPost() {
         return postList;
     }
 

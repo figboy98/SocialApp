@@ -8,6 +8,8 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import pt.up.fc.progmovel.socialapp.ui.posts.Post;
+
 public class SocialAppRepository {
     private final DatabaseDao databaseDao;
 
@@ -15,6 +17,7 @@ public class SocialAppRepository {
         SocialAppDatabase database = SocialAppDatabase.getDatabase(application);
         databaseDao = database.chatDao();
     }
+
     public User getUser(String name){
         User user = null;
         try {
@@ -34,6 +37,19 @@ public class SocialAppRepository {
         }
         return  users;
     }
+
+    public LiveData<List<Post>> getPosts(){
+        LiveData<List<Post>> posts = null;
+        try {
+            posts = new GetPostsAsyncTask(databaseDao).execute().get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return posts;
+    }
+
+
     public void insertChatMessage(ChatMessage message) {
         String chatId = message.getTo();
         new InsertChatMessageAsyncTask(databaseDao).execute(message);
@@ -141,6 +157,18 @@ public class SocialAppRepository {
         @Override
         protected List<User> doInBackground(Void... voids) {
             return databaseDao.getUsers();
+        }
+    }
+
+    private static class GetPostsAsyncTask extends AsyncTask<Void,Void,LiveData<List<Post>>>{
+        private final DatabaseDao databaseDao;
+        public GetPostsAsyncTask(DatabaseDao dao){
+            databaseDao = dao;
+        }
+
+        @Override
+        protected LiveData<List<Post>> doInBackground(Void... voids) {
+            return databaseDao.getPosts();
         }
     }
 

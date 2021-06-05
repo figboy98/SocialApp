@@ -13,7 +13,6 @@ public class ChatMessageListViewModel extends AndroidViewModel {
 
     private final LiveData<GroupChatWithMessages> mGroupChatWithMessages;
 
-
     public ChatMessageListViewModel(@NonNull Application application, String chatID) {
         super(application);
         SocialAppRepository mSocialAppRepository = new SocialAppRepository(application);

@@ -1,4 +1,4 @@
-package pt.up.fc.progmovel.socialapp.ui.posts.impl;
+package pt.up.fc.progmovel.socialapp.ui.posts;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -17,7 +17,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
 
     public PostViewHolder(LayoutInflater inflater, ViewGroup parent){
         super(inflater.inflate(R.layout.post_text,parent,false));
-
         postTextView = itemView.findViewById(R.id.post_content);
     }
 

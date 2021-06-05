@@ -87,6 +87,10 @@ public abstract class SocialAppDatabase extends RoomDatabase {
             mDatabaseDao.insertGroupChatUsersCrossRef(g2);
             mDatabaseDao.insertGroupChatUsersCrossRef(g3);
             mDatabaseDao.insertGroupChatUsersCrossRef(g4);
+
+            Post p1 = new Post(System.currentTimeMillis(), id1, "teste123");
+            mDatabaseDao.insertPost(p1);
+
             return null;
         }
     }

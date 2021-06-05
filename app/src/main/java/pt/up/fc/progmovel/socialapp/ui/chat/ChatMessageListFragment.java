@@ -57,7 +57,6 @@ public class  ChatMessageListFragment extends Fragment {
         mMessagesViewModel = new ViewModelProvider(requireActivity(), chatMessageListViewModelFactory).get(ChatMessageListViewModel.class);
 
 
-
     }
 
     @Override

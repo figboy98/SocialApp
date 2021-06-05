@@ -1,5 +1,7 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
 
-import java.util.Stack;
+import java.util.List;
 
-import pt.up.fc.progmovel.socialapp.ui.posts.impl.PostViewAdapter;
+import pt.up.fc.progmovel.socialapp.ui.chat.ChatGroupsViewModelFactory;
+import pt.up.fc.progmovel.socialapp.util.Constants;
 
 
 public class PostsFragment extends Fragment {
@@ -25,28 +28,37 @@ public class PostsFragment extends Fragment {
     private RecyclerView postsRecyclerView;
     private PostViewAdapter postViewAdapter;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceSate) {
+        super.onCreate(savedInstanceSate);
+        PostsViewModelFactory factory = new PostsViewModelFactory(requireActivity().getApplication());
+        postsViewModel = new ViewModelProvider(requireActivity(), factory).get(PostsViewModel.class);
+    }
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
+
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
         postsRecyclerView = view.findViewById(R.id.posts_list);
         postsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        Observer<Stack<Post>> postsObserver = this::updateUI;
-        postsViewModel.getPost().observe(getViewLifecycleOwner(), postsObserver);
+        final Observer<List<Post>> postsObserver = posts -> {
+            if(posts != null){
+                updateUI(posts);
+            }
+        };
 
+        postsViewModel.getPost().observe(getViewLifecycleOwner(), postsObserver);
         return view;
     }
 
-    private void updateUI(Stack<Post> posts){
+    private void updateUI(List<Post> posts){
         if(postViewAdapter == null){
             postViewAdapter = new PostViewAdapter(posts, getActivity());
             postsRecyclerView.setAdapter(postViewAdapter);
         }else{
             postViewAdapter.notifyDataSetChanged();
         }
-
-        postsRecyclerView.scrollToPosition(0);
     }
 
 }

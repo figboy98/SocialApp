@@ -4,12 +4,18 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
+
+import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 
 
 @Entity
-public class Post implements Serializable {
+public class Post implements Serializable, Comparable<Post>{
 
     @PrimaryKey(autoGenerate = false)
     @NonNull
@@ -57,4 +63,10 @@ public class Post implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
+
+    @Override
+    public int compareTo(Post o) {
+        return Long.compare(this.timestamp, o.timestamp);
+    }
+
 }
