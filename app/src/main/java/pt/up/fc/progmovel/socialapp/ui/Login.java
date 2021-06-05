@@ -24,8 +24,6 @@ public class Login extends AppCompatActivity {
     private EditText nameInput;
     private SocialAppRepository mSocialAppRepository;
     private User mUser;
-    private Constants mConstants;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -325,6 +326,7 @@ public class BluetoothService extends Service {
                 mSocket.connect();
             } catch (IOException e) {
                 Log.d(TAG, "ConnectThread  connecting failed " + e);
+                mBTDevices.remove(mDevice);
                 try {
                     mSocket.close();
                     Log.d(TAG, "ConnectThread, closing connection after failed atempt");
@@ -357,7 +359,6 @@ public class BluetoothService extends Service {
         private final BluetoothSocket mSocket;
         private final InputStream mInputStream;
         private final OutputStream mOutputStream;
-        //private String mGroupId;
 
         public ConnectedThread(BluetoothSocket socket) {
             mSocket = socket;
@@ -369,8 +370,10 @@ public class BluetoothService extends Service {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
                 Log.d(TAG, "Creating input/output streams");
+                mBTDevices.add(socket.getRemoteDevice());
             } catch (IOException e) {
-                Log.d(TAG, "Creating input/output streams failed " + e);
+                Log.d(TAG, "Creating input/output stre;ams failed " + e);
+                mBTDevices.remove(socket.getRemoteDevice());
             }
             mInputStream = tmpIn;
             mOutputStream = tmpOut;
@@ -382,7 +385,7 @@ public class BluetoothService extends Service {
             int message_type = 0;
             //String typeOfMessage;
 
-            byte[] data = new byte[20*1024];
+            byte[] data = new byte[45*1024];
             int current = 0;
             int bytes = 0;
             byte[] tmp;
@@ -395,22 +398,6 @@ public class BluetoothService extends Service {
                     bytes = mInputStream.read(data);
                     buffer.write(data, 0, bytes);
 
-                    /*
-                    beginning of message, detect type of message to be received
-                     */
-                   /* if (current == 0) {
-                        tmp = buffer.toByteArray();
-                        code = Arrays.copyOfRange(tmp, 0, code_size);
-
-                        if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_CHAT_MESSAGE)) {
-                            typeOfMessage = Constants.TYPE_CHAT_MESSAGE;
-                        }
-                        else if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_POST)) {
-                            typeOfMessage = Constants.TYPE_POST_MESSAGE;
-
-                        }
-                    } */
-
                     current += bytes;
 
                     /*
@@ -421,13 +408,6 @@ public class BluetoothService extends Service {
                     int size = tmp.length;
                     code = Arrays.copyOfRange(tmp, size - code_size, size);
 
-                    /*if(Arrays.equals(code,Constants.BLUETOOTH_TYPE_END_OF_MESSAGE) && typeOfMessage.equals(Constants.TYPE_GROUP_CHAT_ID)){
-                        tmp = buffer.toByteArray();
-                        messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
-                        mGroupId = new String(messageArray, charset );
-                        current =0;
-                        buffer.reset();
-                    } */
 
                     if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
@@ -450,21 +430,21 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes, byte[] typeOfMessage) {
             try {
-                byte[] buffer = new byte[10*1024];
+                byte[] buffer = new byte[40*1024];
                 int bytesSent=0;
                 int counter=0;
 
                 Log.d(TAG, "Bytes to send: " + bytes.length);
-                //mOutputStream.write(buffer);
 
                 InputStream object = new ByteArrayInputStream(bytes);
-                BufferedInputStream out = new BufferedInputStream(object, 1024);
+                BufferedInputStream out = new BufferedInputStream(object, buffer.length);
 
                 mOutputStream.write(typeOfMessage);
 
                 while((bytesSent = out.read(buffer))!=-1){
                     mOutputStream.write(buffer,0,bytesSent);
                     counter+=bytesSent;
+                    Log.d(TAG, "Sending bytes: " + bytesSent);
                 }
 
                 mOutputStream.write(Constants.BLUETOOTH_TYPE_END_OF_MESSAGE);
@@ -504,7 +484,7 @@ public class BluetoothService extends Service {
         return true;
     }
 
-    public void verifyWriteReadPermissions() {
+    /*public void verifyWriteReadPermissions() {
         int write = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int read = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
 
@@ -512,24 +492,71 @@ public class BluetoothService extends Service {
 
 
         }
+    }*/
+
+    public Uri writeVideoToStorage(byte[] data) {
+        Uri uri = null;
+        if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q){
+            final ContentValues contentValues = new ContentValues();
+            ContentResolver resolver = getContentResolver();
+            String name = UUID.randomUUID().toString().substring(0,5);
+
+            contentValues.put(MediaStore.Video.Media.DISPLAY_NAME,name);
+            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES);
+            uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
+            try {
+                OutputStream outputStream = resolver.openOutputStream(uri);
+                outputStream.write(data, 0, data.length);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            String moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString();
+            String name = UUID.randomUUID().toString().substring(0,5);
+            File movie = new File(moviesDir, name +".mp4");
+            if (!movie.exists()) {
+                try {
+                    boolean res = movie.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                FileOutputStream outputStream = new FileOutputStream(movie);
+                outputStream.write(data,0,data.length);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            uri = Uri.fromFile(movie);
+        }
+
+
+        return uri;
     }
 
-    public Uri writeToStorage( byte[] data, String type){
-       verifyWriteReadPermissions();
+
+    public Uri writeImageToStorage( byte[] data){
+       //verifyWriteReadPermissions();
        Uri uri = null;
         Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
         final ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "name");
-        OutputStream outputStream = null;
         String name = UUID.randomUUID().toString().substring(0,5);
+
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        OutputStream outputStream = null;
         if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q){
             ContentResolver resolver = getContentResolver();
-            ContentValues values = new ContentValues();
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name );
             contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
             uri= resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
-
+            try {
+                resolver.openOutputStream(uri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             try {
                 outputStream = resolver.openOutputStream(Objects.requireNonNull(uri));
             } catch (FileNotFoundException e) {
@@ -561,12 +588,15 @@ public class BluetoothService extends Service {
 
         if(type.equals("image")){
             Log.d(TAG, "Image Received");
-            Uri uri = writeToStorage(message.getDataBytes(), "image");
+            Uri uri = writeImageToStorage(message.getDataBytes());
             message.setTextMessage(uri.toString());
+            message.setByte(new byte[0]);
 
         }
         else if(type.equals("video")){
             Log.d(TAG, "Video Received");
+            Uri uri = writeVideoToStorage(message.getDataBytes());
+            message.setByte(new byte[0]);
         }
         else if(type.equals("text")){
             //mRepository.insertChatMessage(message);
