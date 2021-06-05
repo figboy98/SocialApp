@@ -1,6 +1,7 @@
 package pt.up.fc.progmovel.socialapp.ui.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,15 +22,20 @@ import com.bumptech.glide.Glide;
 import com.example.socialapp.R;
 
 import java.util.List;
+import java.util.Objects;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 import pt.up.fc.progmovel.socialapp.database.GroupChatWithMessages;
 import pt.up.fc.progmovel.socialapp.util.Constants;
+interface OnMessageListener{
+    void onMessageClick(int position);
+}
 
-public class  ChatMessageListFragment extends Fragment {
+public class  ChatMessageListFragment extends Fragment implements OnMessageListener {
     private RecyclerView mMessagesRecyclerView;
     private ChatMessageListViewModel mMessagesViewModel;
     private MessageAdapter mMessageAdapter;
+    private OnMessageListener mOnMessageListener;
     private static final  int TEXT_RECEIVED =0;
     private static final  int TEXT_SENT =1;
     private static final int IMAGE_RECEIVED =2;
@@ -48,7 +54,7 @@ public class  ChatMessageListFragment extends Fragment {
         if (getArguments() != null) {
             chatID = getArguments().getString(Constants.EXTRA_CHAT_ID);
         }
-
+        mOnMessageListener = this;
         SharedPreferences preferences = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
 
         mLocalUserId = preferences.getString(Constants.SHARED_LOCAL_USER_ID, "");
@@ -80,13 +86,33 @@ public class  ChatMessageListFragment extends Fragment {
     private void updateUI(List<ChatMessage> messagesList){
 
         if(mMessageAdapter == null){
-            mMessageAdapter = new MessageAdapter(messagesList);
+            mMessageAdapter = new MessageAdapter(messagesList,mOnMessageListener);
             mMessagesRecyclerView.setAdapter(mMessageAdapter);
         }
         else{
             mMessageAdapter.setChatMessageList(messagesList);
         }
         mMessagesRecyclerView.scrollToPosition(messagesList.size());
+    }
+
+    @Override
+    public void onMessageClick(int position) {
+        /*Intent videoActivity = new Intent(requireContext(), VideoViewActivity.class);
+
+
+        String path = uri.getPath();
+
+        videoActivity.putExtra(Constants.EXTRA_VIDEO_URI, path );
+        startActivity(videoActivity);*/
+        Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
+
+        Intent mediaIntent = new Intent();
+        mediaIntent.setAction(Intent.ACTION_VIEW);
+        mediaIntent.setData(uri);
+        if(mediaIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager())!=null){
+            startActivity(mediaIntent);
+        }
+
     }
 
     private static class MessageTextReceived extends RecyclerView.ViewHolder {
@@ -152,12 +178,15 @@ public class  ChatMessageListFragment extends Fragment {
         }
     }
 
-    private class MessageVideoReceived extends RecyclerView.ViewHolder{
+    private class MessageVideoReceived extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final ImageView mVideo;
+        private final OnMessageListener mOnClickListener;
 
-        public MessageVideoReceived(LayoutInflater inflater, ViewGroup parent){
+        public MessageVideoReceived(LayoutInflater inflater, ViewGroup parent, OnMessageListener onClickListener){
             super(inflater.inflate(R.layout.chat_video_received,parent,false));
             mVideo = itemView.findViewById(R.id.video_received_holder);
+            itemView.setOnClickListener(this);
+            mOnClickListener = onClickListener;
         }
         public void bind(ChatMessage message){
             Uri videoUri = Uri.parse(message.getTextMessage());
@@ -167,14 +196,23 @@ public class  ChatMessageListFragment extends Fragment {
                     .placeholder(R.drawable.default_image)
                     .into(mVideo);
         }
+
+        @Override
+        public void onClick(View v) {
+            mOnClickListener.onMessageClick(getAdapterPosition());
+        }
     }
 
-    private class MessageVideoSent extends RecyclerView.ViewHolder{
+    private class MessageVideoSent extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final ImageView mVideo;
+        private final OnMessageListener mOnClickListener;
 
-        public MessageVideoSent(LayoutInflater inflater, ViewGroup parent){
+
+        public MessageVideoSent(LayoutInflater inflater, ViewGroup parent, OnMessageListener onMessageListener){
             super(inflater.inflate(R.layout.chat_video_sent,parent,false));
             mVideo = itemView.findViewById(R.id.video_sent_holder);
+            itemView.setOnClickListener(this);
+            mOnClickListener = onMessageListener;
         }
         public void bind(ChatMessage message){
             Uri videoUri = Uri.parse(message.getTextMessage());
@@ -183,11 +221,19 @@ public class  ChatMessageListFragment extends Fragment {
                     .load(videoUri)
                     .into(mVideo);
         }
+
+        @Override
+        public void onClick(View v) {
+            mOnClickListener.onMessageClick(getAdapterPosition());
+
+        }
     }
     private class MessageAdapter extends  RecyclerView.Adapter<RecyclerView.ViewHolder>{
         private List<ChatMessage> mChatMessageList;
-        public MessageAdapter(List<ChatMessage> messages) {
+        private OnMessageListener mOnMessageListener;
+        public MessageAdapter(List<ChatMessage> messages, OnMessageListener onMessageListener) {
             mChatMessageList = messages;
+            mOnMessageListener =onMessageListener;
         }
 
         public void setChatMessageList(List<ChatMessage> messages){
@@ -240,9 +286,9 @@ public class  ChatMessageListFragment extends Fragment {
                 case IMAGE_SENT:
                     return new MessageImageSent(layoutInflater,parent);
                 case VIDEO_RECEIVED:
-                    return new MessageVideoReceived(layoutInflater,parent);
+                    return new MessageVideoReceived(layoutInflater,parent,mOnMessageListener);
                 case VIDEO_SENT:
-                    return new MessageVideoSent(layoutInflater,parent);
+                    return new MessageVideoSent(layoutInflater,parent,mOnMessageListener);
             }
             return new MessageTextSent(layoutInflater, parent);
         }

@@ -1,6 +1,7 @@
 package pt.up.fc.progmovel.socialapp;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -42,15 +43,9 @@ public class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_posts, R.id.navigation_chat)
                 .build();
-
-
-
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
-
-        Intent bluetooth = new Intent(this, BluetoothActivity.class);
-        startActivity(bluetooth);
 
     }
 }

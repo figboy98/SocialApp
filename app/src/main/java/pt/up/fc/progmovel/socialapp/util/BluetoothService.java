@@ -364,7 +364,7 @@ public class BluetoothService extends Service {
 
         public void run() {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            byte[] data = new byte[1024]; // 10 Megabits buffer
+            byte[] data = new byte[1024];
             int current = 0;
             int bytes;
             byte[] tmp;
@@ -409,8 +409,7 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes, byte[] typeOfMessage) {
             try {
-                byte[] buffer = new byte[1024]; //10 Megabits buffer
-                long startTime = System.nanoTime();
+                byte[] buffer = new byte[1024];
 
                 int bytesSent;
                 int counter=0;
@@ -425,14 +424,11 @@ public class BluetoothService extends Service {
                 while((bytesSent = out.read(buffer))!=-1){
                     mOutputStream.write(buffer,0,bytesSent);
                     counter+=bytesSent;
-                   // Log.d(TAG, "Sending bytes: " + bytesSent);
                 }
 
                 mOutputStream.write(Constants.BLUETOOTH_TYPE_END_OF_MESSAGE);
                 Log.d(TAG, "Total bytes sent: " + counter);
-                long stopTime = System.nanoTime();
-                long tmp = stopTime -startTime;
-                Log.d(TAG, "Time: " + tmp);
+
 
 
             } catch (IOException ioException) {

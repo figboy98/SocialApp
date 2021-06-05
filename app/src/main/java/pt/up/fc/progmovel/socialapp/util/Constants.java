@@ -13,6 +13,8 @@ public class Constants {
     public static final String SHARED_LOCAL_USER_ID= "pt.up.fc.progmovel.socialapp.shared.LOCAL_USER_ID";
 
     public static  final String EXTRA_CHAT_ID = "pt.up.fc.progmovel.socialapp.extra.EXTRA_CHAT_ID";
+    public static  final String EXTRA_VIDEO_URI = "pt.up.fc.progmovel.socialapp.extra.EXTRA_VIDEO_URI";
+
     public Constants(){
 
     }

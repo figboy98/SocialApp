@@ -25,7 +25,7 @@ import pt.up.fc.progmovel.socialapp.ui.posts.Post;
                 GroupChatMessagesCrossRef.class,
         },
         exportSchema = false,
-        version = 2
+        version = 1
 )
 public abstract class SocialAppDatabase extends RoomDatabase {
 

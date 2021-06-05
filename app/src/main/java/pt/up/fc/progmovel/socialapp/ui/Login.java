@@ -16,6 +16,7 @@ import com.example.socialapp.R;
 import pt.up.fc.progmovel.socialapp.MainActivity;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 import pt.up.fc.progmovel.socialapp.database.User;
+import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
 import pt.up.fc.progmovel.socialapp.util.Constants;
 
@@ -33,6 +34,8 @@ public class Login extends AppCompatActivity {
         nameInput = findViewById(R.id.login_name_input);
         Button loginButton = findViewById(R.id.login_button);
 
+        Intent bluetooth = new Intent(this, BluetoothActivity.class);
+        startActivity(bluetooth);
 
         Intent communication = new Intent(this, BluetoothService.class);
         this.startService(communication);
