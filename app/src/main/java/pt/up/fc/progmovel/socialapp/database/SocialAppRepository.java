@@ -28,6 +28,16 @@ public class SocialAppRepository {
         return user;
     }
 
+    public User getUserFromId(String userId){
+        User user = null;
+        try {
+            user =  new GetUserFromIdAsyncTask(databaseDao).execute(userId).get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+
     public List<User> getUsers(){
         List<User> users = null;
         try {
@@ -181,6 +191,18 @@ public class SocialAppRepository {
         @Override
         protected User doInBackground(String... strings) {
             return  databaseDao.getUser(strings[0]);
+        }
+    }
+
+    private static class GetUserFromIdAsyncTask extends AsyncTask<String,Void,User>{
+        private final DatabaseDao databaseDao;
+        public GetUserFromIdAsyncTask(DatabaseDao dao){
+            databaseDao = dao;
+        }
+
+        @Override
+        protected User doInBackground(String... strings) {
+            return  databaseDao.getUserFromId(strings[0]);
         }
     }
 

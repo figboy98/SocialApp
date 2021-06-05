@@ -1,5 +1,6 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
+import android.app.Application;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -11,6 +12,8 @@ import com.example.socialapp.R;
 
 import java.util.Date;
 import java.sql.Timestamp;
+
+import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
@@ -27,11 +30,16 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         postDateView = itemView.findViewById(R.id.post_date);
     }
 
-    public void bind(Post post){
+    public void bind(Post post, Application app){
         this.post = post;
         postTextView.setText(post.getContent());
         postDateView.setText(((Date)new Timestamp(post.getTimestamp())).toString());
-        postUserView.setText(post.getUserId());
+
+        String id = post.getUserId();
+        SocialAppRepository mSocialAppRepository = new SocialAppRepository(app);
+        String username = mSocialAppRepository.getUserFromId(id).getName();
+
+        postUserView.setText(username);
     }
 
 }

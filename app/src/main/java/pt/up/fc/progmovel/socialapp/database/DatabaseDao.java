@@ -49,6 +49,9 @@ public interface DatabaseDao {
     @Query("SELECT * FROM POST")
     LiveData<List<Post>> getPosts();
 
+    @Query("SELECT * FROM USER WHERE userId=:userId")
+    User getUserFromId(String userId);
+
     @Query("SELECT * FROM USER WHERE name=:name")
     User getUser(String name);
 
