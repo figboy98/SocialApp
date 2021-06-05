@@ -25,7 +25,7 @@ import pt.up.fc.progmovel.socialapp.ui.posts.Post;
                 GroupChatMessagesCrossRef.class,
         },
         exportSchema = false,
-        version = 3
+        version = 1
 )
 public abstract class SocialAppDatabase extends RoomDatabase {
 
@@ -89,8 +89,9 @@ public abstract class SocialAppDatabase extends RoomDatabase {
             mDatabaseDao.insertGroupChatUsersCrossRef(g4);
 
             Post p1 = new Post(System.currentTimeMillis(), id1, "teste123");
+            Post p2 = new Post(System.currentTimeMillis(), id1, "blabla");
             mDatabaseDao.insertPost(p1);
-
+            mDatabaseDao.insertPost(p2);
             return null;
         }
     }

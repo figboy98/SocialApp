@@ -17,8 +17,8 @@ public class PostViewAdapter extends RecyclerView.Adapter<PostViewHolder>{
     private List<Post> postsList;
     private Activity activity;
 
-    public PostViewAdapter(List<Post> postStack, Activity activity){
-        this.postsList = postStack;
+    public PostViewAdapter(List<Post> posts, Activity activity){
+        this.postsList = posts;
         this.activity = activity;
     }
 
@@ -38,5 +38,9 @@ public class PostViewAdapter extends RecyclerView.Adapter<PostViewHolder>{
     @Override
     public int getItemCount() {
         return postsList.size();
+    }
+
+    public void setPostsList(List<Post> postsList) {
+        this.postsList = postsList;
     }
 }

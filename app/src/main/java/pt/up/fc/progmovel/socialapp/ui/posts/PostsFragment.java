@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pt.up.fc.progmovel.socialapp.ui.chat.ChatGroupsViewModelFactory;
@@ -36,13 +37,10 @@ public class PostsFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        postsViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
-
         View view = inflater.inflate(R.layout.fragment_posts, container, false);
         postsRecyclerView = view.findViewById(R.id.posts_list);
         postsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        final Observer<List<Post>> postsObserver = posts -> {
+        Observer<List<Post>> postsObserver = posts -> {
             if(posts != null){
                 updateUI(posts);
             }
@@ -59,6 +57,8 @@ public class PostsFragment extends Fragment {
         }else{
             postViewAdapter.notifyDataSetChanged();
         }
+
+        postViewAdapter.setPostsList(posts);
     }
 
 }

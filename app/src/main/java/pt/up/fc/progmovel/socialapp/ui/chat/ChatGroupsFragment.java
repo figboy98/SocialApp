@@ -55,7 +55,6 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_chat_groups,container,false);
         mGroupsRecyclerView = view.findViewById(R.id.chat_groups_recycler_view);
-
         mGroupsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         final Observer<UsersWithGroupChats> groupChatsObserver = usersWithGroupChats -> {

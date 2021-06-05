@@ -1,6 +1,7 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -26,6 +27,7 @@ public class PostsViewModel extends AndroidViewModel {
         super(application);
         SocialAppRepository mSocialAppRepository = new SocialAppRepository(application);
         postList = mSocialAppRepository.getPosts();
+        Log.d("1","");
     }
 
     public LiveData<List<Post>> getPost() {
