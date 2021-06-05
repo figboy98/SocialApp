@@ -97,14 +97,14 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
 
     @Override
     public void onMessageClick(int position) {
-        /*Intent videoActivity = new Intent(requireContext(), VideoViewActivity.class);
+        Intent videoActivity = new Intent(requireContext(), VideoActivity.class);
 
+        Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
 
         String path = uri.getPath();
 
         videoActivity.putExtra(Constants.EXTRA_VIDEO_URI, path );
-        startActivity(videoActivity);*/
-//        Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
+        startActivity(videoActivity);
 //
 //        Intent mediaIntent = new Intent();
 //        mediaIntent.setAction(Intent.ACTION_VIEW);

@@ -25,10 +25,13 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ParcelUuid;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -349,8 +352,14 @@ public class BluetoothService extends Service {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-                isConnected = true;
                 Log.d(TAG, "Creating input/output streams");
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(BluetoothService.this, "Connected with Bluetooth", Toast.LENGTH_LONG).show();
+                    }
+                });
             } catch (IOException e) {
                 Log.d(TAG, "Creating input/output streams failed " + e);
             }
