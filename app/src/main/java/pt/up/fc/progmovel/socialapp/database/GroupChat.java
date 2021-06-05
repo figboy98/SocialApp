@@ -13,7 +13,7 @@ public class GroupChat {
     private String groupChatID;
     private String groupName;
 
-
+    public GroupChat(){}
     public GroupChat(String name, @NotNull String groupChatID){
         this.groupChatID = groupChatID;
         groupName = name;

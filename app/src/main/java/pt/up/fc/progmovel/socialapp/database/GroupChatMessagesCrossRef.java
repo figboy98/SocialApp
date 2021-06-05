@@ -13,9 +13,9 @@ public class GroupChatMessagesCrossRef {
     private final String chatMessageID;
 
 
-    public GroupChatMessagesCrossRef(@NotNull String chatID, @NotNull String messageID) {
-        groupChatID = chatID;
-        chatMessageID = messageID;
+    public GroupChatMessagesCrossRef(@NotNull String groupChatID, @NotNull String chatMessageID) {
+        this.groupChatID = groupChatID;
+        this.chatMessageID = chatMessageID;
     }
 
     @NotNull

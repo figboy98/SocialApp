@@ -27,7 +27,7 @@ public class  ChatMessage implements Serializable, Comparable<ChatMessage> {
     private Long mDate;
     @Ignore
     private byte[] dataBytes;
-
+    public ChatMessage(){}
     public ChatMessage(String message, Date date, String from, String to, String type) {
         chatMessageID = UUID.randomUUID().toString();
         mTextMessage = message;
