@@ -23,14 +23,13 @@ import androidx.navigation.ui.NavigationUI;
 import pt.up.fc.progmovel.socialapp.ui.Login;
 import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
-import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;
     private static final int LOCATION_PERMISSION = 2;
     private String mUserID;
     private BluetoothService mBluetoothService;
-    private Constants mConstants;
+    private final String LOCAL_USER_UUID = "pt.up.fc.progmovel.socialapp.extra.USER_ID";
 
 
     BluetoothAdapter bt;
@@ -39,10 +38,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mConstants = new Constants();
         Intent login = new Intent(this, Login.class);
 
-        SharedPreferences preferences = getSharedPreferences(mConstants.SHARED_PREFERENCES,Context.MODE_PRIVATE);
+        ActivityResultLauncher<Intent> loginActivity = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if(data!=null){
+                            mUserID = data.getStringExtra(LOCAL_USER_UUID);
+                            SharedPreferences preferences = getPreferences( Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString(LOCAL_USER_UUID, mUserID).commit();
+                        }
+                    }
+                });
+
+        loginActivity.launch(login);
 
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
