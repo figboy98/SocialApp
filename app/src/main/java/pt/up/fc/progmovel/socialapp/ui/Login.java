@@ -40,9 +40,12 @@ public class Login extends AppCompatActivity {
         Intent communication = new Intent(this, BluetoothService.class);
         this.startService(communication);
 
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 if (nameInput.toString().length() > 0) {
                     name = nameInput.getText().toString();
 
@@ -51,12 +54,10 @@ public class Login extends AppCompatActivity {
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         Intent resultIntent = new Intent();
                         SharedPreferences preferences = getSharedPreferences(Constants.SHARED_PREFERENCES, Context.MODE_PRIVATE);
-                        resultIntent.putExtra(Constants.SHARED_LOCAL_USER_ID, mUser.getUserId());
                         SharedPreferences.Editor editor = preferences.edit();
-                        setResult(MainActivity.RESULT_OK,resultIntent);
                         editor.putString(Constants.SHARED_LOCAL_USER_ID, mUser.getUserId()).apply();
-
                         startActivity(intent);
+                        finish();
                     } else {
                         Toast.makeText(Login.this, "Wrong Username", Toast.LENGTH_LONG).show();
                         nameInput.setText("");

@@ -183,7 +183,6 @@ public class ChatInputFragment extends Fragment {
 
                     } catch (IOException e) {
                         Log.d(TAG, "Error transforming image in bytes: " + e);
-
                     }
 
                     break;

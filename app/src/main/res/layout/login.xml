@@ -13,8 +13,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        style="@style/Widget.AppCompat.EditText"
-        android:hint="Nome de utilizador"/>
+        android:inputType="textNoSuggestions"
+        android:hint="Nome de utilizador"
+        android:autofillHints="false" />
 
     <Button
         android:id="@+id/login_button"

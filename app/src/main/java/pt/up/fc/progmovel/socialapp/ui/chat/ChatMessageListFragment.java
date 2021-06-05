@@ -104,14 +104,14 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
 
         videoActivity.putExtra(Constants.EXTRA_VIDEO_URI, path );
         startActivity(videoActivity);*/
-        Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
-
-        Intent mediaIntent = new Intent();
-        mediaIntent.setAction(Intent.ACTION_VIEW);
-        mediaIntent.setData(uri);
-        if(mediaIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager())!=null){
-            startActivity(mediaIntent);
-        }
+//        Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
+//
+//        Intent mediaIntent = new Intent();
+//        mediaIntent.setAction(Intent.ACTION_VIEW);
+//        mediaIntent.setData(uri);
+//        if(mediaIntent.resolveActivity(Objects.requireNonNull(getActivity()).getPackageManager())!=null){
+//            startActivity(mediaIntent);
+//        }
 
     }
 

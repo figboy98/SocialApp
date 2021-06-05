@@ -24,6 +24,9 @@ public class BluetoothActivity extends AppCompatActivity {
     private ActivityResultLauncher<String> requestCoarseLocation;
     private ActivityResultLauncher<String> requestFineLocation;
     private ActivityResultLauncher<String> requestBluetoothAdminPermission;
+    private ActivityResultLauncher<String> requestReadPermission;
+    private ActivityResultLauncher<String> requestWritePermission;
+
     boolean bluetoothUsePermission = false;
     boolean bluetoothAdminPermission = false;
     boolean coarseLocationPermission = false;
@@ -70,6 +73,17 @@ public class BluetoothActivity extends AppCompatActivity {
                 fineLocationPermission = true;
             }
         });
+        requestWritePermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(),isGranted ->{
+            if(isGranted){
+                writePermission = true;
+            }
+        });
+        requestReadPermission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->{
+            if(isGranted){
+                readPermission = true;
+            }
+        });
+
     }
     @Override
     public void onStart(){
@@ -83,11 +97,11 @@ public class BluetoothActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-//        else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-//            Intent intentDiscover = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-//            intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-//            startActivity(intentDiscover);
-//        }
+        else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            Intent intentDiscover = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivity(intentDiscover);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if(!mLocationManager.isLocationEnabled()){
@@ -95,7 +109,6 @@ public class BluetoothActivity extends AppCompatActivity {
                 startActivity(location);
             }
         }
-
         finish();
     }
 
@@ -146,7 +159,7 @@ public class BluetoothActivity extends AppCompatActivity {
                     //Inform the user of the necessity of this permission
                 }
             }
-            requestBluetoothAdminPermission.launch(Manifest.permission.BLUETOOTH_ADMIN);
+            requestBluetoothAdminPermission.launch(Manifest.permission.BLUETOOTH_PRIVILEGED);
 
 
         }
@@ -175,8 +188,8 @@ public class BluetoothActivity extends AppCompatActivity {
                     //Inform the user of the necessity of this permission
                 }
             }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_WRITE);
-
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_WRITE);
+            requestWritePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if(!readPermission){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -184,9 +197,8 @@ public class BluetoothActivity extends AppCompatActivity {
                     //Inform the user of the necessity of this permission
                 }
             }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_READ);
-
-           // requestWritePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},REQUEST_READ);
+            requestReadPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
 
