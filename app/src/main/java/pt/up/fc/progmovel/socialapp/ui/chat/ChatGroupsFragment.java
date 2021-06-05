@@ -41,7 +41,6 @@ public class ChatGroupsFragment extends Fragment implements  OnChatGroupListener
     private RecyclerView mGroupsRecyclerView;
     private GroupChatAdapter mAdapter = null;
     private OnChatGroupListener mChatGroupListener;
-    private Constants mConstants;
 
     @Override
     public void onCreate(Bundle savedInstanceSate){

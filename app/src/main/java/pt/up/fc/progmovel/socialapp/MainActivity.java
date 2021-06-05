@@ -54,9 +54,5 @@ public class MainActivity extends AppCompatActivity {
         Intent bluetooth = new Intent(this, BluetoothActivity.class);
         startActivity(bluetooth);
 
-        Intent communication = new Intent(this, BluetoothService.class);
-        this.startService(communication);
-
-
     }
 }

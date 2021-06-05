@@ -21,8 +21,6 @@ import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class ChatActivity extends FragmentActivity {
     private String mChatID;
-    private HomeViewModel homeViewModel;
-    private BluetoothService mBluetoothService;
     private Boolean mBound = false;
 
     @Override
@@ -34,28 +32,6 @@ public class ChatActivity extends FragmentActivity {
 
         Bundle bundle = new Bundle();
         bundle.putString(Constants.EXTRA_CHAT_ID, mChatID);
-
-//        ServiceConnection connection = new ServiceConnection() {
-//
-//            @Override
-//            public void onServiceConnected(ComponentName className,
-//                                           IBinder service) {
-//                BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
-//                mBluetoothService = binder.getService();
-//                mBound = true;
-//                byte[] chatId = mChatID.getBytes(mConstants.charset);
-//
-//                mBluetoothService.write(chatId,mConstants.BLUETOOTH_TYPE_GROUP_CHAT_ID_MESSAGE);
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName arg0) {
-//
-//            }
-//        };
-
-//        Intent bluetoohService = new Intent(this, BluetoothService.class);
-//        bindService(bluetoohService, connection, Context.BIND_AUTO_CREATE);
 
         FragmentManager fm = getSupportFragmentManager();
 

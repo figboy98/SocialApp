@@ -169,7 +169,6 @@ public class  ChatMessageListFragment extends Fragment {
 
         public void bind(ChatMessage message){
             Uri imageUri = Uri.parse(message.getTextMessage());
-            //Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
             Glide.with(view).asBitmap().fitCenter().load(imageUri).into(mImage);
 
         }

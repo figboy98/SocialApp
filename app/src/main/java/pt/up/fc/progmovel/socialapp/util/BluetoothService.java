@@ -34,6 +34,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.ParcelUuid;
 import android.provider.MediaStore;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
 import java.util.UUID;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
@@ -88,8 +90,7 @@ public class BluetoothService extends Service {
     private IBinder mIBinder;
     private SocialAppRepository mRepository;
     private int code_size;
-    private final Charset charset = StandardCharsets.UTF_16;
-
+    private boolean isConnected;
     public class LocalBinder extends Binder {
         public BluetoothService getService() {
             return BluetoothService.this;
@@ -107,6 +108,7 @@ public class BluetoothService extends Service {
         mLeScanCallback = new LeScanCallback();
         mRepository = new SocialAppRepository(getApplication());
         code_size = Constants.BLUETOOTH_TYPE_CHAT_MESSAGE.length;
+        isConnected = false;
     }
 
 
@@ -178,7 +180,10 @@ public class BluetoothService extends Service {
     }
 
     private void makeBluetoothConnection(BluetoothDevice device) {
-        startClient(device);
+        if(!isConnected){
+            startClient(device);
+        }
+
     }
 
     private void scanLeDevice(boolean enable) {
@@ -369,6 +374,7 @@ public class BluetoothService extends Service {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
+                isConnected = true;
                 Log.d(TAG, "Creating input/output streams");
                 mBTDevices.add(socket.getRemoteDevice());
             } catch (IOException e) {
@@ -383,9 +389,8 @@ public class BluetoothService extends Service {
         public void run() {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             int message_type = 0;
-            //String typeOfMessage;
 
-            byte[] data = new byte[45*1024];
+            byte[] data = new byte[1024]; // 10 Megabits buffer
             int current = 0;
             int bytes = 0;
             byte[] tmp;
@@ -430,7 +435,9 @@ public class BluetoothService extends Service {
 
         public void write(byte[] bytes, byte[] typeOfMessage) {
             try {
-                byte[] buffer = new byte[40*1024];
+                byte[] buffer = new byte[1024]; //10 Megabits buffer
+                long startTime = System.nanoTime();
+
                 int bytesSent=0;
                 int counter=0;
 
@@ -444,13 +451,17 @@ public class BluetoothService extends Service {
                 while((bytesSent = out.read(buffer))!=-1){
                     mOutputStream.write(buffer,0,bytesSent);
                     counter+=bytesSent;
-                    Log.d(TAG, "Sending bytes: " + bytesSent);
+                   // Log.d(TAG, "Sending bytes: " + bytesSent);
                 }
 
                 mOutputStream.write(Constants.BLUETOOTH_TYPE_END_OF_MESSAGE);
                 Log.d(TAG, "Total bytes sent: " + counter);
+                long stopTime = System.nanoTime();
+                long tmp = stopTime -startTime;
+                Log.d(TAG, "Time: " + tmp);
 
-                } catch (IOException ioException) {
+
+            } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
 
@@ -483,16 +494,6 @@ public class BluetoothService extends Service {
         mConnectedThread.write(bytes, typeOfMessage);
         return true;
     }
-
-    /*public void verifyWriteReadPermissions() {
-        int write = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int read = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (write != PackageManager.PERMISSION_GRANTED || read != PackageManager.PERMISSION_GRANTED) {
-
-
-        }
-    }*/
 
     public Uri writeVideoToStorage(byte[] data) {
         Uri uri = null;
@@ -538,7 +539,6 @@ public class BluetoothService extends Service {
 
 
     public Uri writeImageToStorage( byte[] data){
-       //verifyWriteReadPermissions();
        Uri uri = null;
         Bitmap bitmap = BitmapFactory.decodeByteArray(data,0,data.length);
         final ContentValues contentValues = new ContentValues();
@@ -597,10 +597,13 @@ public class BluetoothService extends Service {
             Log.d(TAG, "Video Received");
             Uri uri = writeVideoToStorage(message.getDataBytes());
             message.setByte(new byte[0]);
+            message.setTextMessage(uri.toString());
         }
         else if(type.equals("text")){
-            //mRepository.insertChatMessage(message);
+
+            Log.d(TAG, "Text Received");
         }
+
         mRepository.insertChatMessage(message);
     }
 
