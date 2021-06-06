@@ -66,7 +66,7 @@ public class Post implements Serializable, Comparable<Post>{
 
     @Override
     public int compareTo(Post o) {
-        return Long.compare(this.timestamp, o.timestamp);
+        return Long.compare(o.timestamp, this.timestamp);
     }
 
 }

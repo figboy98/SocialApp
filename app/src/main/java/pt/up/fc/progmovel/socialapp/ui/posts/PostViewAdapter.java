@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -42,5 +44,6 @@ public class PostViewAdapter extends RecyclerView.Adapter<PostViewHolder>{
 
     public void setPostsList(List<Post> postsList) {
         this.postsList = postsList;
+        Collections.sort(this.postsList);
     }
 }

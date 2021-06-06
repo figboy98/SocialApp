@@ -59,13 +59,15 @@ public class SocialAppRepository {
         return posts;
     }
 
+    public void insertPost(Post post) {
+        new InsertPostAsyncTask(databaseDao).execute(post);
+    }
 
     public void insertChatMessage(ChatMessage message) {
         String chatId = message.getTo();
         new InsertChatMessageAsyncTask(databaseDao).execute(message);
         GroupChatMessagesCrossRef ref = new GroupChatMessagesCrossRef(chatId,message.getChatMessageID());
         new InsertGroupChatMessagesCrossRefAsyncTask(databaseDao).execute(ref);
-
     }
 
     public void insertGroupChat(GroupChat groupChat, List<User> users) {
@@ -98,6 +100,20 @@ public class SocialAppRepository {
     public LiveData<UsersWithGroupChats> getGroupsFromUser(String ID){
         LiveData<UsersWithGroupChats> groups;
         return databaseDao.getUsersWithGroupChats(ID);
+    }
+
+    private static class InsertPostAsyncTask extends AsyncTask<Post, Void, Void> {
+        private final DatabaseDao databaseDao;
+
+        private InsertPostAsyncTask(DatabaseDao dao) {
+            databaseDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Post... posts) {
+            databaseDao.insertPost(posts[0]);
+            return null;
+        }
     }
 
     private static class InsertChatMessageAsyncTask extends AsyncTask<ChatMessage, Void, Void> {
