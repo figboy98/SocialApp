@@ -9,8 +9,6 @@ import androidx.room.Transaction;
 
 import java.util.List;
 
-import pt.up.fc.progmovel.socialapp.ui.posts.Post;
-
 @Dao
 public interface DatabaseDao {
 

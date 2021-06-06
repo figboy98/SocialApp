@@ -1,4 +1,4 @@
-package pt.up.fc.progmovel.socialapp.ui.posts;
+package pt.up.fc.progmovel.socialapp.database;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -8,10 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
-
-import pt.up.fc.progmovel.socialapp.database.ChatMessage;
 
 
 @Entity
@@ -67,6 +64,29 @@ public class Post implements Serializable, Comparable<Post>{
     @Override
     public int compareTo(Post o) {
         return Long.compare(o.timestamp, this.timestamp);
+    }
+
+    public byte[] getByte(){
+        byte[] bytes = null;
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream;
+        try{
+            objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+            bytes = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return  bytes;
     }
 
 }

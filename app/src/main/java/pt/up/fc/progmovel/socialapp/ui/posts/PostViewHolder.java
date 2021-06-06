@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
@@ -13,6 +12,7 @@ import com.example.socialapp.R;
 import java.util.Date;
 import java.sql.Timestamp;
 
+import pt.up.fc.progmovel.socialapp.database.Post;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 
 

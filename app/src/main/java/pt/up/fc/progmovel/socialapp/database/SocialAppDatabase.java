@@ -13,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-import pt.up.fc.progmovel.socialapp.ui.posts.Post;
-
 @Database(
         entities = {
                 ChatMessage.class,

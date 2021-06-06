@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import pt.up.fc.progmovel.socialapp.database.Post;
 
 
 public class PostViewAdapter extends RecyclerView.Adapter<PostViewHolder>{

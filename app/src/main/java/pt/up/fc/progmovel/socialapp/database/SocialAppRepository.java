@@ -8,8 +8,6 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import pt.up.fc.progmovel.socialapp.ui.posts.Post;
-
 public class SocialAppRepository {
     private final DatabaseDao databaseDao;
 

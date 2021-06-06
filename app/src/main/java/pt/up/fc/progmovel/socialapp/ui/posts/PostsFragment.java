@@ -1,8 +1,6 @@
 package pt.up.fc.progmovel.socialapp.ui.posts;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import pt.up.fc.progmovel.socialapp.MainActivity;
-import pt.up.fc.progmovel.socialapp.ui.chat.ChatGroupsViewModelFactory;
+import pt.up.fc.progmovel.socialapp.database.Post;
 import pt.up.fc.progmovel.socialapp.ui.posts.input.PostsInput;
-import pt.up.fc.progmovel.socialapp.util.Constants;
 
 
 public class PostsFragment extends Fragment {

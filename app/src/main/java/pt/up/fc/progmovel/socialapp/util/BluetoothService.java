@@ -53,6 +53,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import pt.up.fc.progmovel.socialapp.database.ChatMessage;
+import pt.up.fc.progmovel.socialapp.database.Post;
 import pt.up.fc.progmovel.socialapp.database.SocialAppRepository;
 
 public class BluetoothService extends Service {
@@ -643,8 +644,10 @@ public class BluetoothService extends Service {
             chatMessageReceived((ChatMessage) object);
 
         }
-        else if(type.equals("String")){
-            Log.d(TAG, "String Received");
+        else if(type.equals("class pt.up.fc.progmovel.socialapp.database.Post")){
+            Log.d(TAG, "Post Received");
+            Post post= (Post) object;
+            mRepository.insertPost(post);
         }
     }
 
