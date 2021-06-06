@@ -1,30 +1,18 @@
 package pt.up.fc.progmovel.socialapp;
 
-import android.app.Activity;
-import android.app.IntentService;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.example.socialapp.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import pt.up.fc.progmovel.socialapp.ui.Login;
-import pt.up.fc.progmovel.socialapp.util.BluetoothActivity;
 import pt.up.fc.progmovel.socialapp.util.BluetoothService;
-import pt.up.fc.progmovel.socialapp.util.Constants;
 
 public class MainActivity extends AppCompatActivity {
     private static final int BLUETOOTH_PERMISSION = 1;

@@ -39,7 +39,7 @@
         </activity>
         <activity android:name="pt.up.fc.progmovel.socialapp.ui.chat.VideoActivity"/>
         <activity android:name="pt.up.fc.progmovel.socialapp.ui.chat.ChatActivity" />
-        <activity android:name="pt.up.fc.progmovel.socialapp.util.BluetoothActivity" />
+        <activity android:name="pt.up.fc.progmovel.socialapp.util.PermissionsActivity" />
         <activity android:name="pt.up.fc.progmovel.socialapp.MainActivity" />
         <activity android:name="pt.up.fc.progmovel.socialapp.ui.posts.input.PostsInput" />
         <service android:name="pt.up.fc.progmovel.socialapp.util.BluetoothService" />

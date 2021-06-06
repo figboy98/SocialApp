@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class BluetoothActivity extends AppCompatActivity {
+public class PermissionsActivity extends AppCompatActivity {
     private static  final int REQUEST_WRITE = 5;
     private static final int REQUEST_READ = 6;
     private BluetoothAdapter mBluetoothAdapter = null;
@@ -97,11 +97,11 @@ public class BluetoothActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             startActivity(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
         }
-        else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-            Intent intentDiscover = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivity(intentDiscover);
-        }
+//        else  if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+//            Intent intentDiscover = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+//            intentDiscover.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+//            startActivity(intentDiscover);
+//        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             if(!mLocationManager.isLocationEnabled()){
