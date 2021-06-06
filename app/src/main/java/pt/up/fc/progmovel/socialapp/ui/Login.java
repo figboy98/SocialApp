@@ -34,6 +34,9 @@ public class Login extends AppCompatActivity {
         nameInput = findViewById(R.id.login_name_input);
         Button loginButton = findViewById(R.id.login_button);
 
+        mUser = mSocialAppRepository.getUser(name);
+
+
         Intent bluetooth = new Intent(this, BluetoothActivity.class);
         startActivity(bluetooth);
 

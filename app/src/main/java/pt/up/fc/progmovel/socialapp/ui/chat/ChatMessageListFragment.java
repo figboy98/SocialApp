@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -92,7 +93,7 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
         else{
             mMessageAdapter.setChatMessageList(messagesList);
         }
-        mMessagesRecyclerView.scrollToPosition(messagesList.size());
+        // mMessagesRecyclerView.scrollToPosition(messagesList.size());
     }
 
     @Override
@@ -101,7 +102,10 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
 
         Uri uri = Uri.parse(Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage());
 
-        String path = uri.getPath();
+
+
+        String path = Objects.requireNonNull(mMessagesViewModel.getMessages().getValue()).chatMessages.get(position).getTextMessage();
+
 
         videoActivity.putExtra(Constants.EXTRA_VIDEO_URI, path );
         startActivity(videoActivity);
@@ -157,7 +161,7 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
 
             Uri imageUri = Uri.parse(message.getTextMessage());
             //Picasso.get().load(imageUri).resize(2000,2000).onlyScaleDown().centerCrop().into(mImage);
-            Glide.with(view).asBitmap().fitCenter().load(imageUri).into(mImage);
+            Glide.with(view).asBitmap().placeholder(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_image,null)).fitCenter().load(imageUri).into(mImage);
 
 
         }
@@ -173,7 +177,7 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
 
         public void bind(ChatMessage message){
             Uri imageUri = Uri.parse(message.getTextMessage());
-            Glide.with(view).asBitmap().fitCenter().load(imageUri).into(mImage);
+            Glide.with(view).asBitmap().placeholder(R.drawable.default_image).fitCenter().load(imageUri).into(mImage);
 
         }
     }
@@ -239,6 +243,7 @@ public class  ChatMessageListFragment extends Fragment implements OnMessageListe
         public void setChatMessageList(List<ChatMessage> messages){
             mChatMessageList = messages;
             notifyDataSetChanged();
+            //mMessagesRecyclerView.scrollToPosition(messages.size()-1);
         }
 
         @Override

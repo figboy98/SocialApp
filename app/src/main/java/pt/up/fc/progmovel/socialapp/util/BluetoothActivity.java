@@ -133,7 +133,7 @@ public class BluetoothActivity extends AppCompatActivity {
             coarseLocationPermission = true;
         }
 
-        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_CHECKIN_PROPERTIES) == PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             fineLocationPermission = true;
         }
 

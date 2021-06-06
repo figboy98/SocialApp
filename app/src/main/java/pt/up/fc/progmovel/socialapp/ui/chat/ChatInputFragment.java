@@ -2,6 +2,7 @@ package pt.up.fc.progmovel.socialapp.ui.chat;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -10,7 +11,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -145,13 +149,13 @@ public class ChatInputFragment extends Fragment {
             mGetContent.launch(mType);
         }
     }
-    private static class SendMessageAsyncTask extends AsyncTask<Activity, Void, Void> {
+    private static class SendMessageAsyncTask extends AsyncTask<Activity,Void,Void>{
         ChatMessage message;
         String type;
 
-        SendMessageAsyncTask(ChatMessage message) {
-            this.message = message;
-            type = message.getType();
+        public SendMessageAsyncTask(ChatMessage chatMessage){
+            message = chatMessage;
+            type = chatMessage.getType();
         }
 
         @Override
@@ -164,9 +168,13 @@ public class ChatInputFragment extends Fragment {
 
                     break;
                 case "image":
-                    mSocialAppRepository.insertChatMessage(message);
                     try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(activities[0].getContentResolver(), Uri.parse(message.getTextMessage()));
+                        ContentResolver contentResolver = activities[0].getContentResolver();
+                        String path= message.getTextMessage();
+                        Uri uri = Uri.parse(path);
+
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(activities[0].getContentResolver(), uri);
+
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
                         byte[] data = baos.toByteArray();
@@ -176,11 +184,26 @@ public class ChatInputFragment extends Fragment {
                         message.setByte(data);
 
                         sent = mBluetoothService.write(message.getByte(), Constants.BLUETOOTH_TYPE_CHAT_MESSAGE);
+                        if(!sent){
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(activities[0].getApplicationContext(), "Doesn't have a bluetooth connection", Toast.LENGTH_LONG).show();
+                                    ;
+                                }
+                            });
+                        }
+                        else{
+                            message.setByte(new byte[0]);
+                            mSocialAppRepository.insertChatMessage(message);
+
+                        }
+
 
                     /*It's not necessary to keep the media bytes in the message, it's just used to send with bluetooth
                     then its saved to the storage */
 
-                        message.setByte(new byte[0]);
 
                     } catch (IOException e) {
                         Log.d(TAG, "Error transforming image in bytes: " + e);
@@ -190,7 +213,8 @@ public class ChatInputFragment extends Fragment {
                 case "video":
                     try {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        InputStream inputStream = activities[0].getContentResolver().openInputStream(Uri.parse(message.getTextMessage()));
+                        Uri uri = Uri.parse(message.getTextMessage());
+                        InputStream inputStream = activities[0].getContentResolver().openInputStream(uri);
                         byte[] buffer = new byte[1024];
                         int n;
                         while (-1 != (n = inputStream.read(buffer)))
@@ -207,6 +231,16 @@ public class ChatInputFragment extends Fragment {
             }
             if (sent) {
                 mSocialAppRepository.insertChatMessage(message);
+            }
+            else {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activities[0].getApplicationContext(), "Doesn't have a bluetooth connection", Toast.LENGTH_LONG).show();
+                        ;
+                    }
+                });
             }
             return null;
         }

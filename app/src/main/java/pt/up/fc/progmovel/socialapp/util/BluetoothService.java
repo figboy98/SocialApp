@@ -463,13 +463,6 @@ public class BluetoothService extends Service {
 
     public boolean write(byte[] bytes, byte[] typeOfMessage) {
         if(mConnectedThread==null){
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(BluetoothService.this, "Doesn't have a connection", Toast.LENGTH_LONG).show();
-                }
-            });
             return false;
         }
 
@@ -486,6 +479,7 @@ public class BluetoothService extends Service {
 
     public Uri writeVideoToStorage(byte[] data) {
         Uri uri;
+        Uri location = null;
         if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q){
             final ContentValues contentValues = new ContentValues();
             ContentResolver resolver = getContentResolver();
@@ -494,7 +488,9 @@ public class BluetoothService extends Service {
             contentValues.put(MediaStore.Video.Media.DISPLAY_NAME,name);
             contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES);
             uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
-            try {
+
+
+        try {
                 OutputStream outputStream = resolver.openOutputStream(uri);
                 outputStream.write(data, 0, data.length);
             } catch (IOException e) {
@@ -520,9 +516,8 @@ public class BluetoothService extends Service {
             }
 
             uri = Uri.fromFile(movie);
+
         }
-
-
         return uri;
     }
 
