@@ -397,12 +397,12 @@ public class BluetoothService extends Service {
                     if (Arrays.equals(code, Constants.BLUETOOTH_TYPE_END_OF_MESSAGE)) {
                         buffer.flush();
                         tmp = buffer.toByteArray();
-                        messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
+                        //messageArray = Arrays.copyOfRange(tmp, code_size, tmp.length-code_size);
 
                         Log.d(TAG, "End of Message, Bytes received in total: " + current);
                         current = 0;
                         buffer.reset();
-                        dataReceived(messageArray);
+                        dataReceived(tmp);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -425,7 +425,7 @@ public class BluetoothService extends Service {
                 InputStream object = new ByteArrayInputStream(bytes);
                 BufferedInputStream out = new BufferedInputStream(object, buffer.length);
 
-                mOutputStream.write(typeOfMessage);
+               // mOutputStream.write(typeOfMessage);
 
                 while((bytesSent = out.read(buffer))!=-1){
                     mOutputStream.write(buffer,0,bytesSent);
@@ -463,10 +463,23 @@ public class BluetoothService extends Service {
 
     public boolean write(byte[] bytes, byte[] typeOfMessage) {
         if(mConnectedThread==null){
-           // Toast.makeText(getApplicationContext(), "No Bluetooth connection", Toast.LENGTH_LONG).show();
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(BluetoothService.this, "Doesn't have a connection", Toast.LENGTH_LONG).show();
+                }
+            });
             return false;
         }
 
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(BluetoothService.this, "Sending Message", Toast.LENGTH_LONG).show();
+            }
+        });
         mConnectedThread.write(bytes, typeOfMessage);
         return true;
     }

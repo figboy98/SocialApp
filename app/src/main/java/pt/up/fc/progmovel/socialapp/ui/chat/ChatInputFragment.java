@@ -132,8 +132,7 @@ public class ChatInputFragment extends Fragment {
                                 Date date = new Date();
                                 Uri uri = result.get(i);
                                 String imagePath = uri.toString();
-                                String decodedPath = Uri.decode(imagePath);
-                                ChatMessage message = new ChatMessage(decodedPath, date, localUserId, mChatID, messageType);
+                                ChatMessage message = new ChatMessage(imagePath, date, localUserId, mChatID, messageType);
                                 new SendMessageAsyncTask(message).execute(requireActivity());
                             }
                         }
